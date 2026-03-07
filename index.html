@@ -808,7 +808,19 @@
                 localStorage.setItem('userRole', user.role);
                 localStorage.setItem('username', user.username);
                 errorMessage.style.display = 'none';
+
+                // 重新加载国家列表和渲染系统选择器
+                initializeCountries();
+                renderCountrySelector();
+
+                // 更新标题
+                const currentCountry = localStorage.getItem('currentCountry') || 'USA';
+                document.getElementById('systemTitle').textContent = COUNTRY_CONFIGS[currentCountry].name;
+                document.getElementById('rulesTitle').textContent = `${COUNTRY_CONFIGS[currentCountry].flag} ${COUNTRY_CONFIGS[currentCountry].label} - 运算规则`;
+
                 checkLoginStatus();
+                loadSettings();
+
                 // 清空输入框
                 document.getElementById('username').value = '';
                 document.getElementById('password').value = '';
@@ -976,6 +988,22 @@
             // 加载设置
             loadSettings();
         };
+
+        // 监听其他标签页的localStorage变化（跨标签页同步）
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'countryList') {
+                // 重新加载国家列表
+                initializeCountries();
+                renderCountrySelector();
+
+                // 更新标题
+                const currentCountry = localStorage.getItem('currentCountry') || 'USA';
+                if (COUNTRY_CONFIGS[currentCountry]) {
+                    document.getElementById('systemTitle').textContent = COUNTRY_CONFIGS[currentCountry].name;
+                    document.getElementById('rulesTitle').textContent = `${COUNTRY_CONFIGS[currentCountry].flag} ${COUNTRY_CONFIGS[currentCountry].label} - 运算规则`;
+                }
+            }
+        });
 
         // 监听输入变化，自动保存管理员设置
         ['profitRate', 'weightRate', 'volumeFactor', 'volumeRate', 'fixedCost', 'minPrice', 'usdRate', 'eurRate'].forEach(id => {
