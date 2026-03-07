@@ -319,6 +319,41 @@
             display: none !important;
         }
 
+        /* 系统选择器样式 */
+        .country-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .country-btn {
+            padding: 12px 24px;
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .country-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .country-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #764ba2;
+        }
+
         @media (max-width: 768px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -359,8 +394,16 @@
 
     <div class="container" id="mainContent">
         <div class="header">
-            <h1>销售价格核算系统</h1>
+            <h1 id="systemTitle">TEMU美国核价系统</h1>
             <p>输入产品信息，自动计算销售价格</p>
+        </div>
+
+        <!-- 系统选择器 -->
+        <div class="country-selector">
+            <button class="country-btn active" data-country="USA" onclick="switchCountry('USA')">🇺🇸 美国</button>
+            <button class="country-btn" data-country="Germany" onclick="switchCountry('Germany')">🇩🇪 德国</button>
+            <button class="country-btn" data-country="France" onclick="switchCountry('France')">🇫🇷 法国</button>
+            <button class="country-btn" data-country="Poland" onclick="switchCountry('Poland')">🇵🇱 波兰</button>
         </div>
 
         <div class="main-content">
@@ -496,6 +539,73 @@
             }
         ];
 
+        // 4个国家系统的默认配置
+        const COUNTRY_CONFIGS = {
+            'USA': {
+                name: 'TEMU美国核价系统',
+                weightRate: 10,
+                volumeFactor: 6000,
+                volumeRate: 8,
+                fixedCost: 5,
+                minPrice: 0,
+                usdRate: 7.2,
+                eurRate: 7.8
+            },
+            'Germany': {
+                name: 'TEMU德国核价系统',
+                weightRate: 12,
+                volumeFactor: 5000,
+                volumeRate: 9,
+                fixedCost: 6,
+                minPrice: 0,
+                usdRate: 7.2,
+                eurRate: 7.8
+            },
+            'France': {
+                name: 'TEMU法国核价系统',
+                weightRate: 11,
+                volumeFactor: 5500,
+                volumeRate: 8.5,
+                fixedCost: 5.5,
+                minPrice: 0,
+                usdRate: 7.2,
+                eurRate: 7.8
+            },
+            'Poland': {
+                name: 'TEMU波兰核价系统',
+                weightRate: 9,
+                volumeFactor: 6000,
+                volumeRate: 7,
+                fixedCost: 4,
+                minPrice: 0,
+                usdRate: 7.2,
+                eurRate: 7.8
+            }
+        };
+
+        // 切换国家系统
+        function switchCountry(country) {
+            // 保存当前国家的配置
+            saveSettings();
+
+            // 切换到新国家
+            localStorage.setItem('currentCountry', country);
+
+            // 更新系统标题
+            document.getElementById('systemTitle').textContent = COUNTRY_CONFIGS[country].name;
+
+            // 更新按钮状态
+            document.querySelectorAll('.country-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.country === country) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // 加载新国家的配置
+            loadSettings();
+        }
+
         // 检查登录状态
         function checkLoginStatus() {
             const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
@@ -571,20 +681,33 @@
 
         // 加载保存的配置
         function loadSettings() {
+            const currentCountry = localStorage.getItem('currentCountry') || 'USA';
             const settings = ['profitRate', 'weightRate', 'volumeFactor', 'volumeRate', 'fixedCost', 'minPrice', 'usdRate', 'eurRate'];
+
             settings.forEach(setting => {
-                const saved = localStorage.getItem(setting);
+                const key = `${currentCountry}_${setting}`;
+                const saved = localStorage.getItem(key);
+
                 if (saved !== null) {
                     document.getElementById(setting).value = saved;
+                } else {
+                    // 使用默认配置
+                    const defaultValue = COUNTRY_CONFIGS[currentCountry][setting];
+                    if (defaultValue !== undefined) {
+                        document.getElementById(setting).value = defaultValue;
+                    }
                 }
             });
         }
 
         // 保存配置
         function saveSettings() {
+            const currentCountry = localStorage.getItem('currentCountry') || 'USA';
             const settings = ['profitRate', 'weightRate', 'volumeFactor', 'volumeRate', 'fixedCost', 'minPrice', 'usdRate', 'eurRate'];
+
             settings.forEach(setting => {
-                localStorage.setItem(setting, document.getElementById(setting).value);
+                const key = `${currentCountry}_${setting}`;
+                localStorage.setItem(key, document.getElementById(setting).value);
             });
         }
 
@@ -686,9 +809,20 @@
             }
         }
 
-        // 页面加载时先检查登录状态，再加载设置
+        // 页面加载时先检查登录状态，恢复国家选择，再加载设置
         window.onload = function() {
             checkLoginStatus();
+
+            // 恢复国家选择
+            const currentCountry = localStorage.getItem('currentCountry') || 'USA';
+            document.getElementById('systemTitle').textContent = COUNTRY_CONFIGS[currentCountry].name;
+            document.querySelectorAll('.country-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.country === currentCountry) {
+                    btn.classList.add('active');
+                }
+            });
+
             loadSettings();
         };
 
