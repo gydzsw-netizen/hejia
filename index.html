@@ -526,6 +526,9 @@
                         <button id="addCountryBtn" onclick="showAddCountryDialog()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
                             ➕ 新增国家
                         </button>
+                        <button id="deleteCountryBtn" onclick="showDeleteCountryDialog()" style="padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                            🗑️ 删除国家
+                        </button>
                         <button id="exportCountryBtn" onclick="exportCountries()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
                             📤 导出国家列表
                         </button>
@@ -554,6 +557,20 @@
                     <div style="display: flex; gap: 10px; margin-top: 20px;">
                         <button onclick="confirmAddCountry()" class="btn" style="flex: 1;">确认添加</button>
                         <button onclick="closeAddCountryDialog()" class="btn" style="flex: 1; background: #999;">取消</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 删除国家对话框 -->
+            <div id="deleteCountryDialog" class="dialog-overlay" style="display: none;">
+                <div class="dialog-box">
+                    <h3>删除国家系统</h3>
+                    <p style="color: #666; margin-bottom: 15px;">选择要删除的国家（默认国家不可删除）</p>
+                    <div id="deleteCountryList" style="max-height: 300px; overflow-y: auto;">
+                        <!-- 动态生成可删除的国家列表 -->
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button onclick="closeDeleteCountryDialog()" class="btn" style="flex: 1; background: #999;">关闭</button>
                     </div>
                 </div>
             </div>
@@ -793,6 +810,71 @@
             event.target.value = '';
         }
 
+        // 显示删除国家对话框
+        function showDeleteCountryDialog() {
+            const deleteList = document.getElementById('deleteCountryList');
+            deleteList.innerHTML = '';
+
+            // 默认国家ID列表（不可删除）
+            const defaultCountries = ['USA', 'Germany', 'France', 'Poland'];
+
+            // 获取所有可删除的国家
+            const deletableCountries = Object.entries(COUNTRY_CONFIGS).filter(([id]) =>
+                !defaultCountries.includes(id)
+            );
+
+            if (deletableCountries.length === 0) {
+                deleteList.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">暂无可删除的国家</p>';
+            } else {
+                deletableCountries.forEach(([id, config]) => {
+                    const item = document.createElement('div');
+                    item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee;';
+                    item.innerHTML = `
+                        <span>${config.flag} ${config.label}</span>
+                        <button onclick="deleteCountry('${id}')" style="padding: 5px 15px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">删除</button>
+                    `;
+                    deleteList.appendChild(item);
+                });
+            }
+
+            document.getElementById('deleteCountryDialog').style.display = 'flex';
+        }
+
+        // 关闭删除国家对话框
+        function closeDeleteCountryDialog() {
+            document.getElementById('deleteCountryDialog').style.display = 'none';
+        }
+
+        // 删除国家
+        function deleteCountry(countryId) {
+            const defaultCountries = ['USA', 'Germany', 'France', 'Poland'];
+
+            if (defaultCountries.includes(countryId)) {
+                alert('默认国家不能删除！');
+                return;
+            }
+
+            const countryName = COUNTRY_CONFIGS[countryId].label;
+            if (!confirm(`确定要删除 ${countryName} 系统吗？`)) {
+                return;
+            }
+
+            delete COUNTRY_CONFIGS[countryId];
+            localStorage.setItem('countryList', JSON.stringify(COUNTRY_CONFIGS));
+
+            const currentCountry = localStorage.getItem('currentCountry');
+            if (currentCountry === countryId) {
+                localStorage.setItem('currentCountry', 'USA');
+                document.getElementById('systemTitle').textContent = COUNTRY_CONFIGS['USA'].name;
+                document.getElementById('rulesTitle').textContent = `${COUNTRY_CONFIGS['USA'].flag} ${COUNTRY_CONFIGS['USA'].label} - 运算规则`;
+                loadSettings();
+            }
+
+            renderCountrySelector();
+            showDeleteCountryDialog();
+            alert(`${countryName} 系统已删除！`);
+        }
+
         // 切换国家系统
         function switchCountry(country) {
             // 保存当前国家的配置
@@ -845,6 +927,7 @@
                     // 显示国家管理功能，显示所有按钮
                     document.getElementById('countryManagement').style.display = 'block';
                     document.getElementById('addCountryBtn').style.display = 'inline-block';
+                    document.getElementById('deleteCountryBtn').style.display = 'inline-block';
                     document.getElementById('exportCountryBtn').style.display = 'inline-block';
                     document.getElementById('exportHint').style.display = 'block';
                     document.getElementById('importHint').style.display = 'none';
@@ -858,6 +941,7 @@
                     // 显示国家管理功能，但只显示导入按钮
                     document.getElementById('countryManagement').style.display = 'block';
                     document.getElementById('addCountryBtn').style.display = 'none';
+                    document.getElementById('deleteCountryBtn').style.display = 'none';
                     document.getElementById('exportCountryBtn').style.display = 'none';
                     document.getElementById('exportHint').style.display = 'none';
                     document.getElementById('importHint').style.display = 'block';
