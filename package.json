@@ -1,0 +1,19 @@
+{
+  "name": "price-calculator",
+  "version": "1.0.0",
+  "description": "销售价格核算系统 - 企业级用户认证版本",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "vercel build",
+    "deploy": "vercel deploy"
+  },
+  "dependencies": {
+    "@vercel/postgres": "^0.10.0",
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "vercel": "^37.0.0"
+  }
+}

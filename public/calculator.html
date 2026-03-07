@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>销售价格核算系统</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>销售价格核算系统</h1>
+            <div class="user-info">
+                <span class="username">用户：<span id="username"></span></span>
+                <div>
+                    <a href="/admin.html" id="adminLink" style="display: none; margin-right: 10px;" class="logout-btn">用户管理</a>
+                    <button id="logoutBtn" class="logout-btn">登出</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- 产品信息输入 -->
+            <div class="card">
+                <h2>产品信息</h2>
+                <div class="form-group">
+                    <label for="weight">产品重量 (kg)</label>
+                    <input type="number" id="weight" placeholder="例如: 2.5" step="0.01" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="cost">产品成本 (元)</label>
+                    <input type="number" id="cost" placeholder="例如: 100" step="0.01" min="0">
+                </div>
+                <div class="form-group">
+                    <label>产品尺寸 (cm)</label>
+                    <div class="size-inputs">
+                        <input type="number" id="length" placeholder="长" step="0.1" min="0">
+                        <input type="number" id="width" placeholder="宽" step="0.1" min="0">
+                        <input type="number" id="height" placeholder="高" step="0.1" min="0">
+                    </div>
+                    <p class="info-text">体积重量 = 长 × 宽 × 高 ÷ 体积系数</p>
+                </div>
+                <button class="btn" id="calculateBtn">计算销售价格</button>
+            </div>
+
+            <!-- 运算规则配置 -->
+            <div class="card">
+                <div class="admin-toggle">
+                    <button id="toggleAdminBtn">运算规则设置</button>
+                </div>
+                <h2>运算规则</h2>
+
+                <div class="admin-section" id="adminSection">
+                    <div class="form-group">
+                        <label for="profitRate">利润率 (%)</label>
+                        <input type="number" id="profitRate" value="30" step="1" min="0">
+                        <p class="info-text">在成本基础上增加的利润百分比</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="weightRate">重量运费系数 (元/kg)</label>
+                        <input type="number" id="weightRate" value="10" step="0.1" min="0">
+                        <p class="info-text">每公斤的运费成本</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="volumeFactor">体积系数</label>
+                        <input type="number" id="volumeFactor" value="6000" step="100" min="1">
+                        <p class="info-text">用于计算体积重量，常用值: 5000-6000</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="volumeRate">体积运费系数 (元/kg)</label>
+                        <input type="number" id="volumeRate" value="8" step="0.1" min="0">
+                        <p class="info-text">体积重量的运费成本</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="fixedCost">固定成本 (元)</label>
+                        <input type="number" id="fixedCost" value="5" step="0.1" min="0">
+                        <p class="info-text">包装、人工等固定成本</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="minPrice">最低售价 (元)</label>
+                        <input type="number" id="minPrice" value="0" step="1" min="0">
+                        <p class="info-text">设置最低销售价格限制</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="usdRate">美元汇率 (CNY/USD)</label>
+                        <input type="number" id="usdRate" value="7.2" step="0.01" min="0.01">
+                        <p class="info-text">1美元 = X人民币，用于计算美元价格</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="eurRate">欧元汇率 (CNY/EUR)</label>
+                        <input type="number" id="eurRate" value="7.8" step="0.01" min="0.01">
+                        <p class="info-text">1欧元 = X人民币，用于计算欧元价格</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 6px;">
+                    <strong>计算公式：</strong>
+                    <p style="margin-top: 10px; font-size: 14px; line-height: 1.6;">
+                        销售价格 = (产品成本 + 重量运费 + 体积运费 + 固定成本) × (1 + 利润率)
+                        <br><br>
+                        重量运费 = 实际重量 × 重量运费系数
+                        <br>
+                        体积运费 = 体积重量 × 体积运费系数
+                        <br>
+                        体积重量 = 长 × 宽 × 高 ÷ 体积系数
+                    </p>
+                </div>
+            </div>
+
+            <!-- 计算结果 -->
+            <div class="card result-card">
+                <h2>计算结果</h2>
+                <div class="result-display">
+                    <div class="label">建议销售价格</div>
+                    <div class="multi-currency">
+                        <div class="currency-box">
+                            <div class="currency-label">人民币 (CNY)</div>
+                            <div class="currency-price" id="resultPriceCNY">¥ 0.00</div>
+                        </div>
+                        <div class="currency-box">
+                            <div class="currency-label">美元 (USD)</div>
+                            <div class="currency-price" id="resultPriceUSD">$ 0.00</div>
+                        </div>
+                        <div class="currency-box">
+                            <div class="currency-label">欧元 (EUR)</div>
+                            <div class="currency-price" id="resultPriceEUR">€ 0.00</div>
+                        </div>
+                    </div>
+                    <div class="formula-section">
+                        <div id="breakdown"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { checkAuth } from '/js/auth.js';
+        import { initCalculator, calculatePrice, toggleAdmin } from '/js/calculator.js';
+
+        // 页面加载时检查认证
+        window.addEventListener('DOMContentLoaded', async () => {
+            const user = await checkAuth();
+            if (user) {
+                await initCalculator();
+            }
+        });
+
+        // 绑定按钮事件
+        document.getElementById('calculateBtn').addEventListener('click', calculatePrice);
+        document.getElementById('toggleAdminBtn').addEventListener('click', toggleAdmin);
+    </script>
+</body>
+</html>

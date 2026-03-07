@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理 - 销售价格核算系统</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .role-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .role-badge.admin {
+            background: #ff9800;
+            color: white;
+        }
+        .role-badge.user {
+            background: #4caf50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>用户管理</h1>
+            <div class="user-info">
+                <span class="username">管理员：<span id="username"></span></span>
+                <div>
+                    <a href="/calculator.html" class="logout-btn" style="margin-right: 10px;">返回计算器</a>
+                    <button id="logoutBtn" class="logout-btn">登出</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content" style="grid-template-columns: 1fr;">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin-bottom: 0;">用户列表</h2>
+                    <button class="btn" style="width: auto; padding: 10px 20px;" id="createUserBtn">创建新用户</button>
+                </div>
+
+                <div id="successMessage" class="success-message"></div>
+                <div id="errorMessage" class="error-message"></div>
+
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>用户名</th>
+                            <th>角色</th>
+                            <th>创建时间</th>
+                            <th>最后登录</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <tr><td colspan="6" style="text-align: center;">加载中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 创建用户模态框 -->
+    <div id="createUserModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>创建新用户</h3>
+                <button class="modal-close" onclick="window.adminModule.hideCreateUserModal()">&times;</button>
+            </div>
+            <form id="createUserForm">
+                <div class="form-group">
+                    <label for="newUsername">用户名</label>
+                    <input type="text" id="newUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">密码（至少8个字符）</label>
+                    <input type="password" id="newPassword" required minlength="8">
+                </div>
+                <div class="form-group">
+                    <label for="newRole">角色</label>
+                    <select id="newRole" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 16px;">
+                        <option value="user">普通用户</option>
+                        <option value="admin">管理员</option>
+                    </select>
+                </div>
+                <div id="createUserError" class="error-message"></div>
+                <button type="submit" class="btn" id="createUserSubmitBtn">创建用户</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 重置密码模态框 -->
+    <div id="resetPasswordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>重置密码</h3>
+                <button class="modal-close" onclick="window.adminModule.hideResetPasswordModal()">&times;</button>
+            </div>
+            <p>为用户 <strong id="resetUsername"></strong> 设置新密码：</p>
+            <form id="resetPasswordForm">
+                <input type="hidden" id="resetUserId">
+                <div class="form-group">
+                    <label for="resetNewPassword">新密码（至少8个字符）</label>
+                    <input type="password" id="resetNewPassword" required minlength="8">
+                </div>
+                <div id="resetPasswordError" class="error-message"></div>
+                <button type="submit" class="btn" id="resetPasswordSubmitBtn">重置密码</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { checkAuth } from '/js/auth.js';
+        import * as adminModule from '/js/admin.js';
+
+        // 将admin模块暴露到全局，供内联事件处理器使用
+        window.adminModule = adminModule;
+
+        // 页面加载时检查认证
+        window.addEventListener('DOMContentLoaded', async () => {
+            const user = await checkAuth();
+            if (user) {
+                await adminModule.initAdmin();
+            }
+        });
+
+        // 绑定按钮事件
+        document.getElementById('createUserBtn').addEventListener('click', adminModule.showCreateUserModal);
+        document.getElementById('createUserForm').addEventListener('submit', adminModule.createUser);
+        document.getElementById('resetPasswordForm').addEventListener('submit', adminModule.resetPassword);
+    </script>
+</body>
+</html>
