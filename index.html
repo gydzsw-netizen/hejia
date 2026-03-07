@@ -440,7 +440,7 @@
                 <div class="admin-toggle">
                     <button onclick="toggleAdmin()">管理员设置</button>
                 </div>
-                <h2 id="rulesTitle">🇺🇸 运算规则</h2>
+                <h2 id="rulesTitle">🇺🇸 美国 - 运算规则</h2>
 
                 <div class="admin-section" id="adminSection">
                     <div class="form-group">
@@ -544,6 +544,7 @@
             'USA': {
                 name: 'TEMU美国核价系统',
                 flag: '🇺🇸',
+                label: '美国',
                 weightRate: 10,
                 volumeFactor: 6000,
                 volumeRate: 8,
@@ -555,6 +556,7 @@
             'Germany': {
                 name: 'TEMU德国核价系统',
                 flag: '🇩🇪',
+                label: '德国',
                 weightRate: 12,
                 volumeFactor: 5000,
                 volumeRate: 9,
@@ -566,6 +568,7 @@
             'France': {
                 name: 'TEMU法国核价系统',
                 flag: '🇫🇷',
+                label: '法国',
                 weightRate: 11,
                 volumeFactor: 5500,
                 volumeRate: 8.5,
@@ -577,6 +580,7 @@
             'Poland': {
                 name: 'TEMU波兰核价系统',
                 flag: '🇵🇱',
+                label: '波兰',
                 weightRate: 9,
                 volumeFactor: 6000,
                 volumeRate: 7,
@@ -598,8 +602,8 @@
             // 更新系统标题
             document.getElementById('systemTitle').textContent = COUNTRY_CONFIGS[country].name;
 
-            // 更新运算规则标题
-            document.getElementById('rulesTitle').textContent = `${COUNTRY_CONFIGS[country].flag} 运算规则`;
+            // 更新运算规则标题（同时显示国旗和国家名称）
+            document.getElementById('rulesTitle').textContent = `${COUNTRY_CONFIGS[country].flag} ${COUNTRY_CONFIGS[country].label} - 运算规则`;
 
             // 更新按钮状态
             document.querySelectorAll('.country-btn').forEach(btn => {
@@ -823,7 +827,7 @@
             // 恢复国家选择
             const currentCountry = localStorage.getItem('currentCountry') || 'USA';
             document.getElementById('systemTitle').textContent = COUNTRY_CONFIGS[currentCountry].name;
-            document.getElementById('rulesTitle').textContent = `${COUNTRY_CONFIGS[currentCountry].flag} 运算规则`;
+            document.getElementById('rulesTitle').textContent = `${COUNTRY_CONFIGS[currentCountry].flag} ${COUNTRY_CONFIGS[currentCountry].label} - 运算规则`;
             document.querySelectorAll('.country-btn').forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.dataset.country === currentCountry) {
