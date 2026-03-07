@@ -30,3 +30,5 @@ desktop.ini
 
 # 旧版本文件（迁移前备份）
 index.html.backup
+
+.vercel
