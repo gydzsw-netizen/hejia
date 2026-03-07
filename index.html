@@ -510,16 +510,19 @@
                 mainContent.style.display = 'block';
                 logoutBtn.classList.remove('hidden');
 
-                // 根据角色控制运算规则配置卡片
+                // 根据角色控制运算规则配置卡片和页面布局
                 const rulesCard = document.getElementById('rulesCard');
+                const resultCard = document.querySelector('.result-card');
 
                 if (userRole === 'admin') {
-                    // 管理员：显示运算规则配置卡片
+                    // 管理员：显示运算规则配置卡片，计算结果跨两列
                     rulesCard.style.display = 'block';
+                    resultCard.style.gridColumn = '1 / -1';
                     logoutBtn.textContent = `退出登录 (管理员: ${username})`;
                 } else {
-                    // 普通员工：隐藏运算规则配置卡片
+                    // 普通员工：隐藏运算规则配置卡片，计算结果与产品信息并排
                     rulesCard.style.display = 'none';
+                    resultCard.style.gridColumn = 'auto';
                     logoutBtn.textContent = `退出登录 (员工: ${username})`;
                 }
             } else {
