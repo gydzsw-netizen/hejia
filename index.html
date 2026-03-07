@@ -393,7 +393,7 @@
             </div>
 
             <!-- 运算规则配置 -->
-            <div class="card">
+            <div class="card" id="rulesCard">
                 <div class="admin-toggle">
                     <button onclick="toggleAdmin()">管理员设置</button>
                 </div>
@@ -510,20 +510,16 @@
                 mainContent.style.display = 'block';
                 logoutBtn.classList.remove('hidden');
 
-                // 根据角色控制管理员功能
-                const adminToggle = document.querySelector('.admin-toggle');
-                const adminSection = document.getElementById('adminSection');
-                const adminInputs = adminSection.querySelectorAll('input');
+                // 根据角色控制运算规则配置卡片
+                const rulesCard = document.getElementById('rulesCard');
 
                 if (userRole === 'admin') {
-                    // 管理员：显示管理员设置按钮，允许修改
-                    adminToggle.style.display = 'block';
-                    adminInputs.forEach(input => input.disabled = false);
+                    // 管理员：显示运算规则配置卡片
+                    rulesCard.style.display = 'block';
                     logoutBtn.textContent = `退出登录 (管理员: ${username})`;
                 } else {
-                    // 普通员工：隐藏管理员设置按钮和运算规则
-                    adminToggle.style.display = 'none';
-                    adminSection.style.display = 'none'; // 完全隐藏运算规则
+                    // 普通员工：隐藏运算规则配置卡片
+                    rulesCard.style.display = 'none';
                     logoutBtn.textContent = `退出登录 (员工: ${username})`;
                 }
             } else {
