@@ -396,6 +396,76 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* 主菜单样式 */
+        .main-menu {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .menu-btn {
+            background: white;
+            border: none;
+            border-radius: 12px;
+            padding: 40px 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .menu-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .menu-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .menu-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .menu-desc {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* 返回按钮样式 */
+        .back-btn-container {
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            padding: 0 20px;
+        }
+
+        .back-btn {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #667eea;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -423,16 +493,33 @@
 
     <div class="container" id="mainContent">
         <div class="header">
-            <h1 id="systemTitle">TEMU美国核价系统</h1>
-            <p>输入产品信息，自动计算销售价格</p>
+            <h1 id="systemTitle">光禹电商ERP系统</h1>
+            <p id="systemDesc">企业资源规划系统</p>
         </div>
 
-        <!-- 系统选择器 -->
-        <div class="country-selector" id="countrySelector">
-            <!-- 动态生成国家按钮 -->
+        <!-- 主菜单 -->
+        <div id="mainMenu" class="main-menu">
+            <div class="menu-grid">
+                <button class="menu-btn" onclick="showCalculator()">
+                    <div class="menu-icon">💰</div>
+                    <div class="menu-title">价格核算</div>
+                    <div class="menu-desc">多国家价格计算系统</div>
+                </button>
+            </div>
         </div>
 
-        <div class="main-content">
+        <!-- 价格核算区域 -->
+        <div id="calculatorSection" style="display: none;">
+            <div class="back-btn-container">
+                <button class="back-btn" onclick="showMainMenu()">← 返回主菜单</button>
+            </div>
+
+            <!-- 系统选择器 -->
+            <div class="country-selector" id="countrySelector">
+                <!-- 动态生成国家按钮 -->
+            </div>
+
+            <div class="main-content">
             <!-- 产品信息输入 -->
             <div class="card">
                 <h2>产品信息</h2>
@@ -603,6 +690,7 @@
                 </div>
             </div>
         </div>
+        </div> <!-- 结束 calculatorSection -->
     </div>
 
     <script>
@@ -953,6 +1041,21 @@
                 mainContent.style.display = 'none';
                 logoutBtn.classList.add('hidden');
             }
+        }
+
+        // 显示价格核算区域
+        function showCalculator() {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('calculatorSection').style.display = 'block';
+            document.getElementById('systemDesc').textContent = '输入产品信息，自动计算销售价格';
+        }
+
+        // 显示主菜单
+        function showMainMenu() {
+            document.getElementById('mainMenu').style.display = 'block';
+            document.getElementById('calculatorSection').style.display = 'none';
+            document.getElementById('systemTitle').textContent = '光禹电商ERP系统';
+            document.getElementById('systemDesc').textContent = '企业资源规划系统';
         }
 
         // 处理登录
