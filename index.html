@@ -522,9 +522,19 @@
                 <!-- 国家管理功能（仅管理员可见） -->
                 <div id="countryManagement" class="admin-section" style="margin-top: 20px; padding: 15px; background: #e8f4f8; border-radius: 6px; display: none;">
                     <strong>国家管理：</strong>
-                    <button onclick="showAddCountryDialog()" style="margin-top: 10px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
-                        ➕ 新增国家
-                    </button>
+                    <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+                        <button onclick="showAddCountryDialog()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                            ➕ 新增国家
+                        </button>
+                        <button onclick="exportCountries()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                            📤 导出国家列表
+                        </button>
+                        <button onclick="document.getElementById('importFile').click()" style="padding: 10px 20px; background: #17a2b8; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                            📥 导入国家列表
+                        </button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importCountries(event)">
+                    </div>
+                    <p style="margin-top: 10px; font-size: 12px; color: #666;">提示：导出后可分享给其他用户导入，实现跨浏览器同步</p>
                 </div>
             </div>
 
@@ -724,6 +734,62 @@
             closeAddCountryDialog();
 
             alert(`${label}系统已添加成功！`);
+        }
+
+        // 导出国家列表
+        function exportCountries() {
+            const dataStr = JSON.stringify(COUNTRY_CONFIGS, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'countries_' + new Date().getTime() + '.json';
+            link.click();
+            URL.revokeObjectURL(url);
+            alert('国家列表已导出！请将文件分享给其他用户导入。');
+        }
+
+        // 导入国家列表
+        function importCountries(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedConfigs = JSON.parse(e.target.result);
+
+                    // 验证导入的数据格式
+                    if (typeof importedConfigs !== 'object') {
+                        alert('导入失败：文件格式不正确！');
+                        return;
+                    }
+
+                    // 合并导入的国家配置
+                    COUNTRY_CONFIGS = { ...COUNTRY_CONFIGS, ...importedConfigs };
+
+                    // 保存到localStorage
+                    localStorage.setItem('countryList', JSON.stringify(COUNTRY_CONFIGS));
+
+                    // 重新渲染系统选择器
+                    renderCountrySelector();
+
+                    // 更新当前显示
+                    const currentCountry = localStorage.getItem('currentCountry') || 'USA';
+                    if (COUNTRY_CONFIGS[currentCountry]) {
+                        document.getElementById('systemTitle').textContent = COUNTRY_CONFIGS[currentCountry].name;
+                        document.getElementById('rulesTitle').textContent = `${COUNTRY_CONFIGS[currentCountry].flag} ${COUNTRY_CONFIGS[currentCountry].label} - 运算规则`;
+                    }
+
+                    alert('国家列表导入成功！共导入 ' + Object.keys(importedConfigs).length + ' 个国家系统。');
+                } catch (error) {
+                    alert('导入失败：文件格式不正确！');
+                }
+            };
+            reader.readAsText(file);
+
+            // 清空文件选择，允许重复导入同一文件
+            event.target.value = '';
         }
 
         // 切换国家系统
