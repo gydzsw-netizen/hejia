@@ -319,6 +319,35 @@
             display: none !important;
         }
 
+        /* 对话框样式 */
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .dialog-box {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .dialog-box h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
         /* 系统选择器样式 */
         .country-selector {
             display: flex;
@@ -399,11 +428,8 @@
         </div>
 
         <!-- 系统选择器 -->
-        <div class="country-selector">
-            <button class="country-btn active" data-country="USA" onclick="switchCountry('USA')">🇺🇸 美国</button>
-            <button class="country-btn" data-country="Germany" onclick="switchCountry('Germany')">🇩🇪 德国</button>
-            <button class="country-btn" data-country="France" onclick="switchCountry('France')">🇫🇷 法国</button>
-            <button class="country-btn" data-country="Poland" onclick="switchCountry('Poland')">🇵🇱 波兰</button>
+        <div class="country-selector" id="countrySelector">
+            <!-- 动态生成国家按钮 -->
         </div>
 
         <div class="main-content">
@@ -492,6 +518,33 @@
                         体积重量 = 长 × 宽 × 高 ÷ 体积系数
                     </p>
                 </div>
+
+                <!-- 国家管理功能（仅管理员可见） -->
+                <div id="countryManagement" class="admin-section" style="margin-top: 20px; padding: 15px; background: #e8f4f8; border-radius: 6px; display: none;">
+                    <strong>国家管理：</strong>
+                    <button onclick="showAddCountryDialog()" style="margin-top: 10px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                        ➕ 新增国家
+                    </button>
+                </div>
+            </div>
+
+            <!-- 新增国家对话框 -->
+            <div id="addCountryDialog" class="dialog-overlay" style="display: none;">
+                <div class="dialog-box">
+                    <h3>新增国家系统</h3>
+                    <div class="form-group">
+                        <label for="newCountryLabel">国家名称</label>
+                        <input type="text" id="newCountryLabel" placeholder="例如: 日本" />
+                    </div>
+                    <div class="form-group">
+                        <label for="newCountryFlag">国旗 Emoji（可选）</label>
+                        <input type="text" id="newCountryFlag" placeholder="例如: 🇯🇵" maxlength="4" />
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button onclick="confirmAddCountry()" class="btn" style="flex: 1;">确认添加</button>
+                        <button onclick="closeAddCountryDialog()" class="btn" style="flex: 1; background: #999;">取消</button>
+                    </div>
+                </div>
             </div>
 
             <!-- 计算结果 -->
@@ -539,8 +592,8 @@
             }
         ];
 
-        // 4个国家系统的默认配置
-        const COUNTRY_CONFIGS = {
+        // 默认的4个国家系统配置
+        const DEFAULT_COUNTRIES = {
             'USA': {
                 name: 'TEMU美国核价系统',
                 flag: '🇺🇸',
@@ -591,6 +644,88 @@
             }
         };
 
+        // 动态加载的国家配置
+        let COUNTRY_CONFIGS = {};
+
+        // 初始化国家列表
+        function initializeCountries() {
+            const savedCountries = localStorage.getItem('countryList');
+            if (savedCountries) {
+                COUNTRY_CONFIGS = JSON.parse(savedCountries);
+            } else {
+                COUNTRY_CONFIGS = {...DEFAULT_COUNTRIES};
+                localStorage.setItem('countryList', JSON.stringify(COUNTRY_CONFIGS));
+            }
+        }
+
+        // 动态生成系统选择器按钮
+        function renderCountrySelector() {
+            const container = document.getElementById('countrySelector');
+            const currentCountry = localStorage.getItem('currentCountry') || 'USA';
+
+            container.innerHTML = '';
+
+            for (const [id, config] of Object.entries(COUNTRY_CONFIGS)) {
+                const button = document.createElement('button');
+                button.className = 'country-btn' + (id === currentCountry ? ' active' : '');
+                button.dataset.country = id;
+                button.onclick = () => switchCountry(id);
+                button.textContent = `${config.flag} ${config.label}`;
+                container.appendChild(button);
+            }
+        }
+
+        // 显示新增国家对话框
+        function showAddCountryDialog() {
+            document.getElementById('addCountryDialog').style.display = 'flex';
+        }
+
+        // 关闭新增国家对话框
+        function closeAddCountryDialog() {
+            document.getElementById('addCountryDialog').style.display = 'none';
+            document.getElementById('newCountryLabel').value = '';
+            document.getElementById('newCountryFlag').value = '';
+        }
+
+        // 确认新增国家
+        function confirmAddCountry() {
+            const label = document.getElementById('newCountryLabel').value.trim();
+            const flag = document.getElementById('newCountryFlag').value.trim() || '🌍';
+
+            if (!label) {
+                alert('请输入国家名称！');
+                return;
+            }
+
+            // 生成唯一ID
+            const id = 'CUSTOM_' + Date.now();
+
+            // 创建新国家配置（使用默认值）
+            COUNTRY_CONFIGS[id] = {
+                name: `TEMU${label}核价系统`,
+                flag: flag,
+                label: label,
+                weightRate: 10,
+                volumeFactor: 6000,
+                volumeRate: 8,
+                fixedCost: 5,
+                minPrice: 0,
+                usdRate: 7.2,
+                eurRate: 7.8
+            };
+
+            // 保存到localStorage
+            localStorage.setItem('countryList', JSON.stringify(COUNTRY_CONFIGS));
+
+            // 重新渲染系统选择器
+            renderCountrySelector();
+
+            // 关闭对话框
+            closeAddCountryDialog();
+
+            alert(`${label}系统已添加成功！`);
+        }
+
         // 切换国家系统
         function switchCountry(country) {
             // 保存当前国家的配置
@@ -639,11 +774,13 @@
                     // 管理员：显示运算规则配置卡片，计算结果跨两列
                     rulesCard.style.display = 'block';
                     resultCard.style.gridColumn = '1 / -1';
+                    document.getElementById('countryManagement').style.display = 'block';
                     logoutBtn.textContent = `退出登录 (管理员: ${username})`;
                 } else {
                     // 普通员工：隐藏运算规则配置卡片，计算结果与产品信息并排
                     rulesCard.style.display = 'none';
                     resultCard.style.gridColumn = 'auto';
+                    document.getElementById('countryManagement').style.display = 'none';
                     logoutBtn.textContent = `退出登录 (员工: ${username})`;
                 }
             } else {
@@ -820,21 +957,23 @@
             }
         }
 
-        // 页面加载时先检查登录状态，恢复国家选择，再加载设置
+        // 页面加载时初始化国家列表，渲染选择器，检查登录状态，加载设置
         window.onload = function() {
+            // 初始化国家列表
+            initializeCountries();
+
+            // 渲染系统选择器
+            renderCountrySelector();
+
+            // 检查登录状态
             checkLoginStatus();
 
             // 恢复国家选择
             const currentCountry = localStorage.getItem('currentCountry') || 'USA';
             document.getElementById('systemTitle').textContent = COUNTRY_CONFIGS[currentCountry].name;
             document.getElementById('rulesTitle').textContent = `${COUNTRY_CONFIGS[currentCountry].flag} ${COUNTRY_CONFIGS[currentCountry].label} - 运算规则`;
-            document.querySelectorAll('.country-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.dataset.country === currentCountry) {
-                    btn.classList.add('active');
-                }
-            });
 
+            // 加载设置
             loadSettings();
         };
 
