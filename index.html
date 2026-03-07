@@ -474,14 +474,24 @@
 
     <script>
         // 登录凭证（使用 Base64 编码）
-        const CREDENTIALS = {
-            username: 'GYDZ',
-            password: btoa('Hgyxiaoyu1314.') // Base64 编码密码
-        };
+        const CREDENTIALS = [
+            {
+                username: 'GYDZ',
+                password: btoa('Hgyxiaoyu1314.'),
+                role: 'admin' // 管理员
+            },
+            {
+                username: 'STAFF',
+                password: btoa('Staff2024'),
+                role: 'employee' // 普通员工
+            }
+        ];
 
         // 检查登录状态
         function checkLoginStatus() {
             const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const userRole = localStorage.getItem('userRole');
+            const username = localStorage.getItem('username');
             const loginOverlay = document.getElementById('loginOverlay');
             const mainContent = document.getElementById('mainContent');
             const logoutBtn = document.getElementById('logoutBtn');
@@ -490,6 +500,24 @@
                 loginOverlay.classList.add('hidden');
                 mainContent.style.display = 'block';
                 logoutBtn.classList.remove('hidden');
+
+                // 根据角色控制管理员功能
+                const adminToggle = document.querySelector('.admin-toggle');
+                const adminSection = document.getElementById('adminSection');
+                const adminInputs = adminSection.querySelectorAll('input');
+
+                if (userRole === 'admin') {
+                    // 管理员：显示管理员设置按钮，允许修改
+                    adminToggle.style.display = 'block';
+                    adminInputs.forEach(input => input.disabled = false);
+                    logoutBtn.textContent = `退出登录 (管理员: ${username})`;
+                } else {
+                    // 普通员工：隐藏管理员设置按钮，禁用修改
+                    adminToggle.style.display = 'none';
+                    adminSection.style.display = 'block'; // 显示规则但不可修改
+                    adminInputs.forEach(input => input.disabled = true);
+                    logoutBtn.textContent = `退出登录 (员工: ${username})`;
+                }
             } else {
                 loginOverlay.classList.remove('hidden');
                 mainContent.style.display = 'none';
@@ -506,8 +534,14 @@
             const errorMessage = document.getElementById('errorMessage');
 
             // 验证账号密码
-            if (username === CREDENTIALS.username && btoa(password) === CREDENTIALS.password) {
+            const user = CREDENTIALS.find(cred =>
+                cred.username === username && cred.password === btoa(password)
+            );
+
+            if (user) {
                 localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userRole', user.role);
+                localStorage.setItem('username', user.username);
                 errorMessage.style.display = 'none';
                 checkLoginStatus();
                 // 清空输入框
@@ -522,6 +556,8 @@
         function handleLogout() {
             if (confirm('确定要退出登录吗？')) {
                 localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('userRole');
+                localStorage.removeItem('username');
                 checkLoginStatus();
             }
         }
