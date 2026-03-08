@@ -508,6 +508,11 @@
                     <div class="menu-title">价格核算</div>
                     <div class="menu-desc">多国家价格计算系统</div>
                 </button>
+                <button class="menu-btn" onclick="showHistory()">
+                    <div class="menu-icon">📋</div>
+                    <div class="menu-title">计算历史记录</div>
+                    <div class="menu-desc">查看历史计算记录</div>
+                </button>
                 <button class="menu-btn" id="userManagementBtn" onclick="showUserManagement()" style="display: none;">
                     <div class="menu-icon">⚙️</div>
                     <div class="menu-title">系统设置</div>
@@ -730,37 +735,47 @@
                 </div>
             </div>
 
-            <!-- 历史记录 -->
-            <div class="card" style="grid-column: 1 / -1;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 style="margin-bottom: 0;">📋 计算历史记录</h2>
-                    <button onclick="refreshHistory()" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">刷新</button>
-                </div>
-
-                <div style="margin-bottom: 15px;">
-                    <input type="text" id="historySearch" placeholder="搜索产品名称..." style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px;" onkeyup="searchHistory()">
-                </div>
-
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="background: #f5f5f5; border-bottom: 2px solid #667eea;">
-                                <th style="padding: 12px; text-align: left;">时间</th>
-                                <th style="padding: 12px; text-align: left;">产品名称</th>
-                                <th style="padding: 12px; text-align: left;">重量</th>
-                                <th style="padding: 12px; text-align: left;">成本</th>
-                                <th style="padding: 12px; text-align: left;">销售价格</th>
-                                <th style="padding: 12px; text-align: center;">操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historyListBody">
-                            <tr><td colspan="6" style="text-align: center; padding: 20px; color: #999;">暂无历史记录</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
         </div> <!-- 结束 calculatorSection -->
+
+        <!-- 历史记录区域 -->
+        <div id="historySection" style="display: none;">
+            <div class="back-btn-container">
+                <button class="back-btn" onclick="showMainMenu()">← 返回主菜单</button>
+            </div>
+
+            <div class="main-content" style="grid-template-columns: 1fr;">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin-bottom: 0;">📋 计算历史记录</h2>
+                        <button onclick="refreshHistory()" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">刷新</button>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <input type="text" id="historySearch" placeholder="搜索产品名称..." style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px;" onkeyup="searchHistory()">
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f5f5f5; border-bottom: 2px solid #667eea;">
+                                    <th style="padding: 12px; text-align: left;">时间</th>
+                                    <th style="padding: 12px; text-align: left;">产品名称</th>
+                                    <th style="padding: 12px; text-align: left;">重量</th>
+                                    <th style="padding: 12px; text-align: left;">成本</th>
+                                    <th style="padding: 12px; text-align: left;">销售价格</th>
+                                    <th style="padding: 12px; text-align: center;">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyListBody">
+                                <tr><td colspan="6" style="text-align: center; padding: 20px; color: #999;">暂无历史记录</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- 结束 historySection -->
+
 
         <!-- 用户管理区域 -->
         <div id="userManagementSection" style="display: none;">
@@ -1355,6 +1370,7 @@
         function showMainMenu() {
             document.getElementById('mainMenu').style.display = 'block';
             document.getElementById('calculatorSection').style.display = 'none';
+            document.getElementById('historySection').style.display = 'none';
             document.getElementById('userManagementSection').style.display = 'none';
             document.getElementById('systemTitle').textContent = '光禹电商ERP系统';
             document.getElementById('systemDesc').textContent = '企业资源规划系统';
@@ -1675,6 +1691,14 @@
             document.getElementById('userManagementSection').style.display = 'block';
             document.getElementById('systemDesc').textContent = '管理系统用户';
             loadUserList();
+        }
+
+        // 显示历史记录区域
+        function showHistory() {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('historySection').style.display = 'block';
+            document.getElementById('systemDesc').textContent = '查看历史计算记录';
+            refreshHistory();
         }
 
         // 加载用户列表
