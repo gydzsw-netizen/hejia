@@ -510,7 +510,7 @@
                     <div class="menu-title">修改密码</div>
                     <div class="menu-desc">更改账号密码</div>
                 </button>
-                <button class="menu-btn" id="userManagementBtn" onclick="showCreateUserModal()" style="display: none;">
+                <button class="menu-btn" id="userManagementBtn" onclick="showUserManagement()" style="display: none;">
                     <div class="menu-icon">👥</div>
                     <div class="menu-title">用户管理</div>
                     <div class="menu-desc">创建和管理用户</div>
@@ -701,6 +701,60 @@
             </div>
         </div>
         </div> <!-- 结束 calculatorSection -->
+
+        <!-- 用户管理区域 -->
+        <div id="userManagementSection" style="display: none;">
+            <div class="back-btn-container">
+                <button class="back-btn" onclick="showMainMenu()">← 返回主菜单</button>
+            </div>
+
+            <div class="main-content" style="grid-template-columns: 1fr;">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin-bottom: 0;">用户管理</h2>
+                        <button class="btn" style="width: auto; padding: 10px 20px;" onclick="showCreateUserModal()">创建新用户</button>
+                    </div>
+
+                    <div id="userManagementSuccess" class="success-message" style="color: #28a745; margin-bottom: 10px; display: none;"></div>
+                    <div id="userManagementError" class="error-message" style="color: #dc3545; margin-bottom: 10px; display: none;"></div>
+
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                        <thead>
+                            <tr style="background: #f5f5f5; border-bottom: 2px solid #667eea;">
+                                <th style="padding: 12px; text-align: left;">用户名</th>
+                                <th style="padding: 12px; text-align: left;">角色</th>
+                                <th style="padding: 12px; text-align: left;">创建时间</th>
+                                <th style="padding: 12px; text-align: center;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userListBody">
+                            <tr><td colspan="4" style="text-align: center; padding: 20px;">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 重置密码对话框 -->
+    <div id="resetPasswordDialog" class="dialog-overlay" style="display: none;">
+        <div class="dialog-box">
+            <h3>重置用户密码</h3>
+            <p>为用户 <strong id="resetPasswordUsername"></strong> 设置新密码：</p>
+            <form id="resetPasswordForm" onsubmit="handleResetPassword(event)">
+                <input type="hidden" id="resetPasswordUserId">
+                <div class="form-group">
+                    <label for="resetNewPassword">新密码（至少8个字符）</label>
+                    <input type="password" id="resetNewPassword" placeholder="请输入新密码" required minlength="8" />
+                </div>
+                <div id="resetPasswordError" class="error-message" style="color: #dc3545; margin-bottom: 10px; display: none;"></div>
+                <div id="resetPasswordSuccess" class="success-message" style="color: #28a745; margin-bottom: 10px; display: none;"></div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn" style="flex: 1;" id="resetPasswordBtn">重置密码</button>
+                    <button type="button" onclick="closeResetPasswordDialog()" class="btn" style="flex: 1; background: #999;">取消</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- 修改密码对话框 -->
@@ -1133,6 +1187,7 @@
         function showMainMenu() {
             document.getElementById('mainMenu').style.display = 'block';
             document.getElementById('calculatorSection').style.display = 'none';
+            document.getElementById('userManagementSection').style.display = 'none';
             document.getElementById('systemTitle').textContent = '光禹电商ERP系统';
             document.getElementById('systemDesc').textContent = '企业资源规划系统';
         }
@@ -1406,6 +1461,220 @@
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = '创建用户';
+            }
+        }
+
+        // 显示用户管理区域
+        function showUserManagement() {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('userManagementSection').style.display = 'block';
+            document.getElementById('systemDesc').textContent = '管理系统用户';
+            loadUserList();
+        }
+
+        // 加载用户列表
+        async function loadUserList() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                document.getElementById('userManagementError').textContent = '请先登录系统';
+                document.getElementById('userManagementError').style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/users/list', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.users) {
+                    renderUserList(data.users);
+                } else {
+                    document.getElementById('userManagementError').textContent = data.message || '加载用户列表失败';
+                    document.getElementById('userManagementError').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('userManagementError').textContent = '网络错误，请检查连接后重试';
+                document.getElementById('userManagementError').style.display = 'block';
+            }
+        }
+
+        // 渲染用户列表
+        function renderUserList(users) {
+            const tbody = document.getElementById('userListBody');
+
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">暂无用户</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = users.map(user => `
+                <tr style="border-bottom: 1px solid #e0e0e0;">
+                    <td style="padding: 12px;">${escapeHtml(user.username)}</td>
+                    <td style="padding: 12px;">
+                        <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; ${user.role === 'admin' ? 'background: #ff9800; color: white;' : 'background: #4caf50; color: white;'}">
+                            ${user.role === 'admin' ? '管理员' : '普通用户'}
+                        </span>
+                    </td>
+                    <td style="padding: 12px;">${formatDateTime(user.created_at)}</td>
+                    <td style="padding: 12px; text-align: center;">
+                        <button onclick="showResetPasswordModal(${user.id}, '${escapeHtml(user.username)}')" class="btn" style="padding: 6px 12px; margin-right: 5px; font-size: 14px;">重置密码</button>
+                        <button onclick="confirmDeleteUser(${user.id}, '${escapeHtml(user.username)}')" class="btn" style="padding: 6px 12px; background: #dc3545; font-size: 14px;">删除</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 转义HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 格式化日期时间
+        function formatDateTime(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // 确认删除用户
+        function confirmDeleteUser(userId, username) {
+            if (confirm(`确定要删除用户 "${username}" 吗？此操作不可恢复。`)) {
+                deleteUser(userId);
+            }
+        }
+
+        // 删除用户
+        async function deleteUser(userId) {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                document.getElementById('userManagementError').textContent = '请先登录系统';
+                document.getElementById('userManagementError').style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/users/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ userId })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('userManagementSuccess').textContent = '用户删除成功';
+                    document.getElementById('userManagementSuccess').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('userManagementSuccess').style.display = 'none';
+                    }, 3000);
+                    loadUserList();
+                } else {
+                    document.getElementById('userManagementError').textContent = data.message || '删除用户失败';
+                    document.getElementById('userManagementError').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('userManagementError').textContent = '网络错误，请检查连接后重试';
+                document.getElementById('userManagementError').style.display = 'block';
+            }
+        }
+
+        // 显示重置密码对话框
+        function showResetPasswordModal(userId, username) {
+            document.getElementById('resetPasswordDialog').style.display = 'flex';
+            document.getElementById('resetPasswordForm').reset();
+            document.getElementById('resetPasswordUserId').value = userId;
+            document.getElementById('resetPasswordUsername').textContent = username;
+            document.getElementById('resetPasswordError').style.display = 'none';
+            document.getElementById('resetPasswordSuccess').style.display = 'none';
+        }
+
+        // 关闭重置密码对话框
+        function closeResetPasswordDialog() {
+            document.getElementById('resetPasswordDialog').style.display = 'none';
+        }
+
+        // 处理重置密码
+        async function handleResetPassword(event) {
+            event.preventDefault();
+
+            const userId = document.getElementById('resetPasswordUserId').value;
+            const newPassword = document.getElementById('resetNewPassword').value;
+            const errorElement = document.getElementById('resetPasswordError');
+            const successElement = document.getElementById('resetPasswordSuccess');
+            const submitBtn = document.getElementById('resetPasswordBtn');
+
+            // 隐藏之前的消息
+            errorElement.style.display = 'none';
+            successElement.style.display = 'none';
+
+            // 验证密码长度
+            if (newPassword.length < 8) {
+                errorElement.textContent = '密码长度至少为8个字符';
+                errorElement.style.display = 'block';
+                return;
+            }
+
+            // 获取JWT token
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                errorElement.textContent = '请先登录系统';
+                errorElement.style.display = 'block';
+                return;
+            }
+
+            try {
+                submitBtn.disabled = true;
+                submitBtn.textContent = '重置中...';
+
+                // 调用API重置密码
+                const response = await fetch('/api/users/reset-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        userId: parseInt(userId),
+                        newPassword
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    successElement.textContent = '密码重置成功！';
+                    successElement.style.display = 'block';
+
+                    // 2秒后关闭对话框
+                    setTimeout(() => {
+                        closeResetPasswordDialog();
+                    }, 2000);
+                } else {
+                    errorElement.textContent = data.message || '重置密码失败，请重试';
+                    errorElement.style.display = 'block';
+                }
+            } catch (error) {
+                errorElement.textContent = '网络错误，请检查连接后重试';
+                errorElement.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '重置密码';
             }
         }
 
