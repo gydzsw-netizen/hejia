@@ -1248,6 +1248,30 @@
             );
 
             if (user) {
+                // 硬编码凭证验证成功，尝试初始化数据库并获取JWT token
+                try {
+                    // 先尝试初始化数据库（如果已初始化会失败，但不影响）
+                    await fetch('/api/auth/init', {
+                        method: 'POST'
+                    });
+
+                    // 再次尝试API登录以获取JWT token
+                    const retryResponse = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    if (retryResponse.ok) {
+                        const data = await retryResponse.json();
+                        localStorage.setItem('authToken', data.token);
+                    }
+                } catch (error) {
+                    console.log('初始化或获取token失败:', error);
+                }
+
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userRole', user.role);
                 localStorage.setItem('username', user.username);
