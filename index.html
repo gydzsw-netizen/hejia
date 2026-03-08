@@ -1868,13 +1868,21 @@
             const successElement = document.getElementById('updateUsernameSuccess');
             const submitBtn = document.getElementById('updateUsernameBtn');
 
+            // 检查元素是否存在
+            if (!submitBtn || !errorElement || !successElement) {
+                console.error('修改用户名对话框元素未找到');
+                return;
+            }
+
             // 隐藏之前的消息
             errorElement.style.display = 'none';
             successElement.style.display = 'none';
 
             // 禁用提交按钮
-            submitBtn.disabled = true;
-            submitBtn.textContent = '修改中...';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = '修改中...';
+            }
 
             const token = localStorage.getItem('authToken');
 
@@ -1916,8 +1924,10 @@
                 errorElement.style.display = 'block';
             } finally {
                 // 恢复提交按钮
-                submitBtn.disabled = false;
-                submitBtn.textContent = '确认修改';
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '确认修改';
+                }
             }
         }
 
