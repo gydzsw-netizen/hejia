@@ -1515,8 +1515,10 @@
             }
 
             try {
-                submitBtn.disabled = true;
-                submitBtn.textContent = '修改中...';
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = '修改中...';
+                }
 
                 // 调用API修改密码
                 const response = await fetch('/api/users/change-password', {
@@ -1550,8 +1552,10 @@
                 errorElement.textContent = '网络错误，请检查连接后重试';
                 errorElement.style.display = 'block';
             } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = '确认修改';
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '确认修改';
+                }
             }
         }
 
@@ -1605,8 +1609,10 @@
             }
 
             try {
-                submitBtn.disabled = true;
-                submitBtn.textContent = '创建中...';
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = '创建中...';
+                }
 
                 // 调用API创建用户
                 const response = await fetch('/api/users/create', {
@@ -1640,8 +1646,10 @@
                 errorElement.textContent = '网络错误，请检查连接后重试';
                 errorElement.style.display = 'block';
             } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = '创建用户';
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '创建用户';
+                }
             }
         }
 
