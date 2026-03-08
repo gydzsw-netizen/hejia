@@ -1296,6 +1296,11 @@
                         method: 'POST'
                     });
 
+                    // 确保默认用户存在（GYDZ 和 STAFF）
+                    await fetch('/api/auth/ensure-users', {
+                        method: 'POST'
+                    });
+
                     // 再次尝试API登录以获取JWT token
                     const retryResponse = await fetch('/api/auth/login', {
                         method: 'POST',
