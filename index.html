@@ -885,13 +885,21 @@
         let COUNTRY_CONFIGS = {};
 
         // 初始化国家列表
-        function initializeCountries() {
-            const savedCountries = localStorage.getItem('countryList');
-            if (savedCountries) {
-                COUNTRY_CONFIGS = JSON.parse(savedCountries);
-            } else {
+        // 从服务器加载国家配置
+        async function initializeCountries() {
+            try {
+                const response = await fetch('/api/countries/list');
+                if (response.ok) {
+                    const data = await response.json();
+                    COUNTRY_CONFIGS = data.countries;
+                    console.log('从服务器加载国家配置成功');
+                } else {
+                    console.error('从服务器加载国家配置失败，使用默认配置');
+                    COUNTRY_CONFIGS = {...DEFAULT_COUNTRIES};
+                }
+            } catch (error) {
+                console.error('加载国家配置出错:', error);
                 COUNTRY_CONFIGS = {...DEFAULT_COUNTRIES};
-                localStorage.setItem('countryList', JSON.stringify(COUNTRY_CONFIGS));
             }
         }
 
@@ -925,7 +933,7 @@
         }
 
         // 确认新增国家
-        function confirmAddCountry() {
+        async function confirmAddCountry() {
             const label = document.getElementById('newCountryLabel').value.trim();
             const flag = document.getElementById('newCountryFlag').value.trim() || '🌍';
 
@@ -937,30 +945,44 @@
             // 生成唯一ID
             const id = 'CUSTOM_' + Date.now();
 
-            // 创建新国家配置（使用默认值）
-            COUNTRY_CONFIGS[id] = {
-                name: `TEMU${label}核价系统`,
-                flag: flag,
-                label: label,
-                weightRate: 10,
-                volumeFactor: 6000,
-                volumeRate: 8,
-                fixedCost: 5,
-                minPrice: 0,
-                usdRate: 7.2,
-                eurRate: 7.8
-            };
+            try {
+                // 调用服务器API创建国家
+                const response = await fetch('/api/countries/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        countryId: id,
+                        name: `TEMU${label}核价系统`,
+                        flag: flag,
+                        label: label,
+                        weightRate: 10,
+                        volumeFactor: 6000,
+                        volumeRate: 8,
+                        fixedCost: 5,
+                        minPrice: 0,
+                        usdRate: 7.2,
+                        eurRate: 7.8
+                    })
+                });
 
-            // 保存到localStorage
-            localStorage.setItem('countryList', JSON.stringify(COUNTRY_CONFIGS));
-
-            // 重新渲染系统选择器
-            renderCountrySelector();
-
-            // 关闭对话框
-            closeAddCountryDialog();
-
-            alert(`${label}系统已添加成功！`);
+                if (response.ok) {
+                    // 重新加载国家配置
+                    await initializeCountries();
+                    // 重新渲染系统选择器
+                    renderCountrySelector();
+                    // 关闭对话框
+                    closeAddCountryDialog();
+                    alert(`${label}系统已添加成功！`);
+                } else {
+                    const data = await response.json();
+                    alert('添加失败：' + (data.message || '未知错误'));
+                }
+            } catch (error) {
+                console.error('添加国家出错:', error);
+                alert('添加失败，请检查网络连接');
+            }
         }
 
         // 导出国家列表
@@ -1055,8 +1077,8 @@
         }
 
         // 删除国家
-        function deleteCountry(countryId) {
-            const defaultCountries = ['USA', 'Germany', 'France', 'Poland'];
+        async function deleteCountry(countryId) {
+            const defaultCountries = ['USA', 'UK', 'DE', 'FR'];
 
             if (defaultCountries.includes(countryId)) {
                 alert('默认国家不能删除！');
@@ -1068,20 +1090,39 @@
                 return;
             }
 
-            delete COUNTRY_CONFIGS[countryId];
-            localStorage.setItem('countryList', JSON.stringify(COUNTRY_CONFIGS));
+            try {
+                // 调用服务器API删除国家
+                const response = await fetch('/api/countries/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ countryId })
+                });
 
-            const currentCountry = localStorage.getItem('currentCountry');
-            if (currentCountry === countryId) {
-                localStorage.setItem('currentCountry', 'USA');
-                document.getElementById('systemTitle').textContent = COUNTRY_CONFIGS['USA'].name;
-                document.getElementById('rulesTitle').textContent = `${COUNTRY_CONFIGS['USA'].flag} ${COUNTRY_CONFIGS['USA'].label} - 运算规则`;
-                loadSettings();
+                if (response.ok) {
+                    // 重新加载国家配置
+                    await initializeCountries();
+
+                    const currentCountry = localStorage.getItem('currentCountry');
+                    if (currentCountry === countryId) {
+                        localStorage.setItem('currentCountry', 'USA');
+                        document.getElementById('systemTitle').textContent = COUNTRY_CONFIGS['USA'].name;
+                        document.getElementById('rulesTitle').textContent = `${COUNTRY_CONFIGS['USA'].flag} ${COUNTRY_CONFIGS['USA'].label} - 运算规则`;
+                        loadSettings();
+                    }
+
+                    renderCountrySelector();
+                    showDeleteCountryDialog();
+                    alert(`${countryName} 系统已删除！`);
+                } else {
+                    const data = await response.json();
+                    alert('删除失败：' + (data.message || '未知错误'));
+                }
+            } catch (error) {
+                console.error('删除国家出错:', error);
+                alert('删除失败，请检查网络连接');
             }
-
-            renderCountrySelector();
-            showDeleteCountryDialog();
-            alert(`${countryName} 系统已删除！`);
         }
 
         // 切换国家系统
