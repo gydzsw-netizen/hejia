@@ -15,7 +15,7 @@ async function handler(req, res) {
   }
 
   // 保护默认国家不被删除
-  const defaultCountries = ['USA', 'UK', 'DE', 'FR'];
+  const defaultCountries = ['USA', 'Germany', 'France', 'Poland'];
   if (defaultCountries.includes(countryId)) {
     throw new Error('默认国家不能删除');
   }
