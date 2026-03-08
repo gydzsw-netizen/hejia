@@ -555,11 +555,49 @@
                     <input type="number" id="profitRate" value="30" step="1" min="0">
                     <p class="info-text">在成本基础上增加的利润百分比</p>
                 </div>
+                <div class="form-group">
+                    <label>活动占比 (%)</label>
+                    <input type="text" id="activityRateDisplay" value="0" readonly style="background: #f5f5f5; cursor: not-allowed;">
+                    <p class="info-text">活动花费占销售额的比例（管理员可在运算规则中修改）</p>
+                </div>
+                <div class="form-group">
+                    <label>广告占比 (%)</label>
+                    <input type="text" id="adRateDisplay" value="0" readonly style="background: #f5f5f5; cursor: not-allowed;">
+                    <p class="info-text">广告花费占销售额的比例（管理员可在运算规则中修改）</p>
+                </div>
                 <button class="btn" onclick="calculatePrice()">计算销售价格</button>
             </div>
 
+            <!-- 计算结果 -->
+            <div class="card result-card" style="grid-column: auto;">
+                <h2>计算结果</h2>
+                <div class="result-display">
+                    <div class="label">建议销售价格</div>
+                    <div class="multi-currency">
+                        <div class="currency-box">
+                            <div class="currency-label">人民币 (CNY)</div>
+                            <div class="currency-price" id="resultPriceCNY">¥ 0.00</div>
+                            <div class="currency-profit" id="resultProfitCNY">利润: ¥ 0.00</div>
+                        </div>
+                        <div class="currency-box">
+                            <div class="currency-label">美元 (USD)</div>
+                            <div class="currency-price" id="resultPriceUSD">$ 0.00</div>
+                            <div class="currency-profit" id="resultProfitUSD">利润: $ 0.00</div>
+                        </div>
+                        <div class="currency-box">
+                            <div class="currency-label">欧元 (EUR)</div>
+                            <div class="currency-price" id="resultPriceEUR">€ 0.00</div>
+                            <div class="currency-profit" id="resultProfitEUR">利润: € 0.00</div>
+                        </div>
+                    </div>
+                    <div class="formula-section">
+                        <div id="breakdown"></div>
+                    </div>
+                </div>
+            </div>
+
             <!-- 运算规则配置 -->
-            <div class="card" id="rulesCard">
+            <div class="card" id="rulesCard" style="grid-column: 1 / -1;">
                 <div class="admin-toggle">
                     <button onclick="toggleAdmin()">管理员设置</button>
                 </div>
@@ -601,18 +639,35 @@
                         <input type="number" id="eurRate" value="7.8" step="0.01" min="0.01">
                         <p class="info-text">1欧元 = X人民币，用于计算欧元价格</p>
                     </div>
+                    <div class="form-group">
+                        <label for="activityRate">活动占比 (%)</label>
+                        <input type="number" id="activityRate" value="0" step="0.1" min="0" max="100">
+                        <p class="info-text">活动花费占销售额的比例</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="adRate">广告占比 (%)</label>
+                        <input type="number" id="adRate" value="0" step="0.1" min="0" max="100">
+                        <p class="info-text">广告花费占销售额的比例</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="refundRate">退款率占比 (%)</label>
+                        <input type="number" id="refundRate" value="0" step="0.1" min="0" max="100">
+                        <p class="info-text">退款损失占销售额的比例</p>
+                    </div>
                 </div>
 
                 <div style="margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 6px;">
                     <strong>计算公式：</strong>
                     <p style="margin-top: 10px; font-size: 14px; line-height: 1.6;">
-                        销售价格 = (产品成本 + 重量运费 + 体积运费 + 固定成本) × (1 + 利润率)
+                        销售价格 = (产品成本 + 重量运费 + 体积运费 + 固定成本) × (1 + 利润率) / (1 - 活动占比 - 广告占比 - 退款率占比)
                         <br><br>
                         重量运费 = 实际重量 × 重量运费系数
                         <br>
                         体积运费 = 体积重量 × 体积运费系数
                         <br>
                         体积重量 = 长 × 宽 × 高 ÷ 体积系数
+                        <br><br>
+                        <strong>说明：</strong>活动占比、广告占比、退款率占比均为销售额的百分比
                     </p>
                 </div>
 
@@ -672,31 +727,33 @@
                 </div>
             </div>
 
-            <!-- 计算结果 -->
-            <div class="card result-card">
-                <h2>计算结果</h2>
-                <div class="result-display">
-                    <div class="label">建议销售价格</div>
-                    <div class="multi-currency">
-                        <div class="currency-box">
-                            <div class="currency-label">人民币 (CNY)</div>
-                            <div class="currency-price" id="resultPriceCNY">¥ 0.00</div>
-                            <div class="currency-profit" id="resultProfitCNY">利润: ¥ 0.00</div>
-                        </div>
-                        <div class="currency-box">
-                            <div class="currency-label">美元 (USD)</div>
-                            <div class="currency-price" id="resultPriceUSD">$ 0.00</div>
-                            <div class="currency-profit" id="resultProfitUSD">利润: $ 0.00</div>
-                        </div>
-                        <div class="currency-box">
-                            <div class="currency-label">欧元 (EUR)</div>
-                            <div class="currency-price" id="resultPriceEUR">€ 0.00</div>
-                            <div class="currency-profit" id="resultProfitEUR">利润: € 0.00</div>
-                        </div>
-                    </div>
-                    <div class="formula-section">
-                        <div id="breakdown"></div>
-                    </div>
+            <!-- 历史记录 -->
+            <div class="card" style="grid-column: 1 / -1;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin-bottom: 0;">📋 计算历史记录</h2>
+                    <button onclick="refreshHistory()" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">刷新</button>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <input type="text" id="historySearch" placeholder="搜索产品名称..." style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px;" onkeyup="searchHistory()">
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #f5f5f5; border-bottom: 2px solid #667eea;">
+                                <th style="padding: 12px; text-align: left;">时间</th>
+                                <th style="padding: 12px; text-align: left;">产品名称</th>
+                                <th style="padding: 12px; text-align: left;">重量</th>
+                                <th style="padding: 12px; text-align: left;">成本</th>
+                                <th style="padding: 12px; text-align: left;">销售价格</th>
+                                <th style="padding: 12px; text-align: center;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyListBody">
+                            <tr><td colspan="6" style="text-align: center; padding: 20px; color: #999;">暂无历史记录</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -813,6 +870,50 @@
                     <button type="button" onclick="closeCreateUserDialog()" class="btn" style="flex: 1; background: #999;">取消</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- 历史记录详情对话框 -->
+    <div id="historyDetailDialog" class="dialog-overlay" style="display: none;">
+        <div class="dialog-box" style="max-width: 600px;">
+            <h3>📋 计算详情</h3>
+            <div style="background: #f5f5f5; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                <div style="display: grid; grid-template-columns: 120px 1fr; gap: 10px; font-size: 14px;">
+                    <strong>产品名称：</strong><span id="detailProductName"></span>
+                    <strong>计算时间：</strong><span id="detailDate"></span>
+                    <strong>重量：</strong><span id="detailWeight"></span>
+                    <strong>成本：</strong><span id="detailCost"></span>
+                    <strong>尺寸：</strong><span id="detailSize"></span>
+                </div>
+            </div>
+            <div style="background: #e8f4f8; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                <h4 style="margin-bottom: 10px;">销售价格</h4>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
+                    <div>
+                        <div style="font-size: 12px; color: #666;">人民币</div>
+                        <div style="font-size: 20px; font-weight: bold; color: #667eea;" id="detailPriceCNY"></div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #666;">美元</div>
+                        <div style="font-size: 20px; font-weight: bold; color: #667eea;" id="detailPriceUSD"></div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #666;">欧元</div>
+                        <div style="font-size: 20px; font-weight: bold; color: #667eea;" id="detailPriceEUR"></div>
+                    </div>
+                </div>
+            </div>
+            <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                <h4 style="margin-bottom: 10px;">成本明细</h4>
+                <div style="font-size: 14px; line-height: 1.8;">
+                    <div>重量运费：<span id="detailWeightShipping"></span></div>
+                    <div>体积运费：<span id="detailVolumeShipping"></span></div>
+                    <div>总成本：<span id="detailTotalCost"></span></div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button onclick="closeHistoryDetailDialog()" class="btn" style="flex: 1;">关闭</button>
+            </div>
         </div>
     </div>
 
@@ -1172,9 +1273,9 @@
                 const resultCard = document.querySelector('.result-card');
 
                 if (userRole === 'admin') {
-                    // 管理员：显示运算规则配置卡片，计算结果跨两列
+                    // 管理员：显示运算规则配置卡片，计算结果与产品信息并排
                     rulesCard.style.display = 'block';
-                    resultCard.style.gridColumn = '1 / -1';
+                    resultCard.style.gridColumn = 'auto';
 
                     // 显示用户管理按钮
                     const userManagementBtn = document.getElementById('userManagementBtn');
@@ -1875,6 +1976,9 @@
             const minPrice = parseFloat(document.getElementById('minPrice').value);
             const usdRate = parseFloat(document.getElementById('usdRate').value);
             const eurRate = parseFloat(document.getElementById('eurRate').value);
+            const activityRate = parseFloat(document.getElementById('activityRate').value) / 100;
+            const adRate = parseFloat(document.getElementById('adRate').value) / 100;
+            const refundRate = parseFloat(document.getElementById('refundRate').value) / 100;
 
             // 验证输入
             if (weight <= 0 || cost <= 0) {
@@ -1893,7 +1997,9 @@
             const totalCost = cost + weightShipping + volumeShipping + fixedCost;
 
             // 计算销售价格（人民币）
-            let salePriceCNY = totalCost * (1 + profitRate);
+            // 新公式：销售价格 = 基础成本 × (1 + 利润率) / (1 - 活动占比 - 广告占比 - 退款率占比)
+            const totalRateDeduction = activityRate + adRate + refundRate;
+            let salePriceCNY = totalCost * (1 + profitRate) / (1 - totalRateDeduction);
 
             // 应用最低价格限制
             if (salePriceCNY < minPrice) {
@@ -1922,6 +2028,11 @@
             const userRole = localStorage.getItem('userRole');
 
             if (userRole === 'admin') {
+                // 计算各项占比对应的金额
+                const activityCost = salePriceCNY * activityRate;
+                const adCost = salePriceCNY * adRate;
+                const refundCost = salePriceCNY * refundRate;
+
                 // 管理员：显示完整的运算明细
                 const breakdown = `
                     <div style="text-align: left; font-size: 0.9em;">
@@ -1932,8 +2043,12 @@
                         <p>• 体积运费: ${volumeWeight.toFixed(2)} kg × ¥${volumeRate.toFixed(2)} = ¥${volumeShipping.toFixed(2)}</p>
                         <p>• 固定成本: ¥${fixedCost.toFixed(2)}</p>
                         <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3);"><strong>总成本: ¥${totalCost.toFixed(2)}</strong></p>
-                        <p><strong>利润率: ${(profitRate * 100).toFixed(0)}%</strong></p>
+                        <p><strong>利润率: ${(profitRate * 100).toFixed(1)}%</strong></p>
                         <p><strong>利润金额: ¥${(salePriceCNY - totalCost).toFixed(2)}</strong></p>
+                        <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3);"><strong>销售额占比扣除：</strong></p>
+                        <p>• 活动占比: ${(activityRate * 100).toFixed(1)}% = ¥${activityCost.toFixed(2)}</p>
+                        <p>• 广告占比: ${(adRate * 100).toFixed(1)}% = ¥${adCost.toFixed(2)}</p>
+                        <p>• 退款率占比: ${(refundRate * 100).toFixed(1)}% = ¥${refundCost.toFixed(2)}</p>
                         <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3);"><strong>汇率设置：</strong></p>
                         <p>• 美元汇率: 1 USD = ¥${usdRate.toFixed(2)}</p>
                         <p>• 欧元汇率: 1 EUR = ¥${eurRate.toFixed(2)}</p>
@@ -1943,6 +2058,210 @@
             } else {
                 // 普通员工：不显示运算明细
                 document.getElementById('breakdown').innerHTML = '';
+            }
+
+            // 保存历史记录
+            saveCalculationHistory({
+                productName: null,
+                weight: weight,
+                cost: cost,
+                length: length || null,
+                width: width || null,
+                height: height || null,
+                calculatedPriceCny: salePriceCNY,
+                calculatedPriceUsd: salePriceUSD,
+                calculatedPriceEur: salePriceEUR,
+                weightShipping: weightShipping,
+                volumeShipping: volumeShipping,
+                totalCost: totalCost,
+                settingsSnapshot: {
+                    profitRate: profitRate * 100,
+                    weightRate: weightRate,
+                    volumeFactor: volumeFactor,
+                    volumeRate: volumeRate,
+                    fixedCost: fixedCost,
+                    minPrice: minPrice,
+                    usdRate: usdRate,
+                    eurRate: eurRate,
+                    activityRate: activityRate * 100,
+                    adRate: adRate * 100,
+                    refundRate: refundRate * 100
+                }
+            });
+        }
+
+        // 历史记录相关函数
+        let currentHistory = [];
+
+        // 保存计算历史记录
+        async function saveCalculationHistory(calculationData) {
+            try {
+                const response = await fetch('/api/history/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(calculationData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('保存历史记录失败');
+                }
+
+                // 刷新历史记录列表
+                await refreshHistory();
+            } catch (error) {
+                console.error('保存历史记录失败:', error);
+            }
+        }
+
+        // 刷新历史记录列表
+        async function refreshHistory() {
+            try {
+                const response = await fetch('/api/history/list?limit=50&offset=0', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('加载历史记录失败');
+                }
+
+                const data = await response.json();
+                currentHistory = data.history;
+                renderHistoryList(data.history);
+            } catch (error) {
+                console.error('加载历史记录失败:', error);
+            }
+        }
+
+        // 搜索历史记录
+        async function searchHistory() {
+            const searchText = document.getElementById('historySearch').value;
+            try {
+                const response = await fetch(`/api/history/list?limit=50&offset=0&search=${encodeURIComponent(searchText)}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('搜索历史记录失败');
+                }
+
+                const data = await response.json();
+                currentHistory = data.history;
+                renderHistoryList(data.history);
+            } catch (error) {
+                console.error('搜索历史记录失败:', error);
+            }
+        }
+
+        // 渲染历史记录列表
+        function renderHistoryList(history) {
+            const container = document.getElementById('historyListBody');
+            if (!container) return;
+
+            if (!history || history.length === 0) {
+                container.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #999;">暂无历史记录</td></tr>';
+                return;
+            }
+
+            container.innerHTML = history.map(item => {
+                const date = new Date(item.created_at).toLocaleString('zh-CN');
+                const productName = item.product_name || '未命名产品';
+
+                return `
+                    <tr style="border-bottom: 1px solid #e0e0e0;">
+                        <td style="padding: 12px;">${date}</td>
+                        <td style="padding: 12px;">${productName}</td>
+                        <td style="padding: 12px;">${item.weight} kg</td>
+                        <td style="padding: 12px;">¥${parseFloat(item.cost).toFixed(2)}</td>
+                        <td style="padding: 12px;">
+                            <div>¥${parseFloat(item.calculated_price_cny).toFixed(2)}</div>
+                            <div style="font-size: 12px; color: #666;">
+                                $${parseFloat(item.calculated_price_usd).toFixed(2)} /
+                                €${parseFloat(item.calculated_price_eur).toFixed(2)}
+                            </div>
+                        </td>
+                        <td style="padding: 12px; text-align: center;">
+                            <button onclick="viewHistoryDetail(${item.id})" style="padding: 5px 10px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px;">查看</button>
+                            <button onclick="deleteHistoryItem(${item.id})" style="padding: 5px 10px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">删除</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 查看历史记录详情
+        function viewHistoryDetail(id) {
+            const item = currentHistory.find(h => h.id === id);
+            if (!item) return;
+
+            const dialog = document.getElementById('historyDetailDialog');
+            if (!dialog) return;
+
+            // 填充详情数据
+            document.getElementById('detailProductName').textContent = item.product_name || '未命名产品';
+            document.getElementById('detailDate').textContent = new Date(item.created_at).toLocaleString('zh-CN');
+            document.getElementById('detailWeight').textContent = `${item.weight} kg`;
+            document.getElementById('detailCost').textContent = `¥${parseFloat(item.cost).toFixed(2)}`;
+
+            if (item.length && item.width && item.height) {
+                document.getElementById('detailSize').textContent = `${item.length} × ${item.width} × ${item.height} cm`;
+            } else {
+                document.getElementById('detailSize').textContent = '未提供';
+            }
+
+            document.getElementById('detailPriceCNY').textContent = `¥${parseFloat(item.calculated_price_cny).toFixed(2)}`;
+            document.getElementById('detailPriceUSD').textContent = `$${parseFloat(item.calculated_price_usd).toFixed(2)}`;
+            document.getElementById('detailPriceEUR').textContent = `€${parseFloat(item.calculated_price_eur).toFixed(2)}`;
+
+            if (item.weight_shipping) {
+                document.getElementById('detailWeightShipping').textContent = `¥${parseFloat(item.weight_shipping).toFixed(2)}`;
+            }
+            if (item.volume_shipping) {
+                document.getElementById('detailVolumeShipping').textContent = `¥${parseFloat(item.volume_shipping).toFixed(2)}`;
+            }
+            if (item.total_cost) {
+                document.getElementById('detailTotalCost').textContent = `¥${parseFloat(item.total_cost).toFixed(2)}`;
+            }
+
+            dialog.style.display = 'flex';
+        }
+
+        // 关闭历史记录详情对话框
+        function closeHistoryDetailDialog() {
+            const dialog = document.getElementById('historyDetailDialog');
+            if (dialog) {
+                dialog.style.display = 'none';
+            }
+        }
+
+        // 删除历史记录项
+        async function deleteHistoryItem(id) {
+            if (!confirm('确定要删除这条历史记录吗？')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/history/delete?id=${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('删除失败');
+                }
+
+                alert('删除成功');
+                await refreshHistory();
+            } catch (error) {
+                alert('删除失败：' + error.message);
             }
         }
 
@@ -1964,6 +2283,31 @@
 
             // 加载设置
             loadSettings();
+
+            // 加载历史记录
+            refreshHistory();
+
+            // 监听活动占比和广告占比的变化，同步到产品信息栏的只读显示
+            const activityRateInput = document.getElementById('activityRate');
+            const adRateInput = document.getElementById('adRate');
+            const activityRateDisplay = document.getElementById('activityRateDisplay');
+            const adRateDisplay = document.getElementById('adRateDisplay');
+
+            if (activityRateInput && activityRateDisplay) {
+                activityRateInput.addEventListener('input', function() {
+                    activityRateDisplay.value = this.value;
+                });
+                // 初始化显示值
+                activityRateDisplay.value = activityRateInput.value;
+            }
+
+            if (adRateInput && adRateDisplay) {
+                adRateInput.addEventListener('input', function() {
+                    adRateDisplay.value = this.value;
+                });
+                // 初始化显示值
+                adRateDisplay.value = adRateInput.value;
+            }
         };
 
         // 监听其他标签页的localStorage变化（跨标签页同步）

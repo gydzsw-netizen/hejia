@@ -26,7 +26,10 @@ async function handler(req, res) {
     'fixed_cost',
     'min_price',
     'usd_rate',
-    'eur_rate'
+    'eur_rate',
+    'activity_rate',
+    'ad_rate',
+    'refund_rate'
   ];
 
   for (const field of allowedFields) {
