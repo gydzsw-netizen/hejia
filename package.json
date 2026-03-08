@@ -4,7 +4,7 @@
   "description": "销售价格核算系统 - 企业级用户认证版本",
   "type": "module",
   "scripts": {
-    "dev": "vercel dev",
+    "dev": "echo 'Use vercel dev to start development server'",
     "build": "vercel build",
     "deploy": "vercel deploy"
   },

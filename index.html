@@ -881,6 +881,27 @@
         </div>
     </div>
 
+    <!-- 修改用户名对话框 -->
+    <div id="updateUsernameDialog" class="dialog-overlay" style="display: none;">
+        <div class="dialog-box">
+            <h3>修改用户名</h3>
+            <p>为用户 <strong id="updateUsernameOldName"></strong> 设置新用户名：</p>
+            <form id="updateUsernameForm" onsubmit="handleUpdateUsername(event)">
+                <input type="hidden" id="updateUsernameUserId">
+                <div class="form-group">
+                    <label for="updateNewUsername">新用户名（3-50个字符）</label>
+                    <input type="text" id="updateNewUsername" placeholder="请输入新用户名" required minlength="3" maxlength="50" />
+                </div>
+                <div id="updateUsernameError" class="error-message" style="color: #dc3545; margin-bottom: 10px; display: none;"></div>
+                <div id="updateUsernameSuccess" class="success-message" style="color: #28a745; margin-bottom: 10px; display: none;"></div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn" style="flex: 1;" id="updateUsernameBtn">确认修改</button>
+                    <button type="button" onclick="closeUpdateUsernameDialog()" class="btn" style="flex: 1; background: #999;">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- 历史记录详情对话框 -->
     <div id="historyDetailDialog" class="dialog-overlay" style="display: none;">
         <div class="dialog-box" style="max-width: 600px;">
@@ -1733,6 +1754,7 @@
                         <td style="padding: 12px;">${formatDateTime(user.created_at)}</td>
                         <td style="padding: 12px; text-align: center;">
                             ${toggleButton}
+                            ${isSystemAdmin ? '' : `<button onclick="showUpdateUsernameModal(${user.id}, '${escapeHtml(user.username)}')" class="btn" style="padding: 6px 12px; margin-right: 5px; font-size: 14px; background: #2196F3;">修改用户名</button>`}
                             <button onclick="showResetPasswordModal(${user.id}, '${escapeHtml(user.username)}')" class="btn" style="padding: 6px 12px; margin-right: 5px; font-size: 14px;">修改密码</button>
                             ${deleteButton}
                         </td>
@@ -1819,6 +1841,84 @@
         // 关闭重置密码对话框
         function closeResetPasswordDialog() {
             document.getElementById('resetPasswordDialog').style.display = 'none';
+        }
+
+        // 显示修改用户名对话框
+        function showUpdateUsernameModal(userId, username) {
+            document.getElementById('updateUsernameDialog').style.display = 'flex';
+            document.getElementById('updateUsernameForm').reset();
+            document.getElementById('updateUsernameUserId').value = userId;
+            document.getElementById('updateUsernameOldName').textContent = username;
+            document.getElementById('updateUsernameError').style.display = 'none';
+            document.getElementById('updateUsernameSuccess').style.display = 'none';
+        }
+
+        // 关闭修改用户名对话框
+        function closeUpdateUsernameDialog() {
+            document.getElementById('updateUsernameDialog').style.display = 'none';
+        }
+
+        // 处理修改用户名
+        async function handleUpdateUsername(event) {
+            event.preventDefault();
+
+            const userId = document.getElementById('updateUsernameUserId').value;
+            const newUsername = document.getElementById('updateNewUsername').value;
+            const errorElement = document.getElementById('updateUsernameError');
+            const successElement = document.getElementById('updateUsernameSuccess');
+            const submitBtn = document.getElementById('updateUsernameBtn');
+
+            // 隐藏之前的消息
+            errorElement.style.display = 'none';
+            successElement.style.display = 'none';
+
+            // 禁用提交按钮
+            submitBtn.disabled = true;
+            submitBtn.textContent = '修改中...';
+
+            const token = localStorage.getItem('authToken');
+
+            try {
+                const response = await fetch('/api/users/update-username', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        userId: parseInt(userId),
+                        newUsername: newUsername
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    successElement.textContent = '用户名修改成功！';
+                    successElement.style.display = 'block';
+
+                    // 2秒后关闭对话框并刷新列表
+                    setTimeout(() => {
+                        closeUpdateUsernameDialog();
+                        loadUserList();
+                        document.getElementById('userManagementSuccess').textContent = `用户名已成功修改为 ${newUsername}`;
+                        document.getElementById('userManagementSuccess').style.display = 'block';
+                        setTimeout(() => {
+                            document.getElementById('userManagementSuccess').style.display = 'none';
+                        }, 3000);
+                    }, 2000);
+                } else {
+                    errorElement.textContent = data.message || '修改用户名失败';
+                    errorElement.style.display = 'block';
+                }
+            } catch (error) {
+                errorElement.textContent = '网络错误，请检查连接后重试';
+                errorElement.style.display = 'block';
+            } finally {
+                // 恢复提交按钮
+                submitBtn.disabled = false;
+                submitBtn.textContent = '确认修改';
+            }
         }
 
         // 处理重置密码

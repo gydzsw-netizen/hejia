@@ -32,3 +32,4 @@ desktop.ini
 index.html.backup
 
 .vercel
+.env*.local

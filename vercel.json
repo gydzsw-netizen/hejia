@@ -1,7 +1,7 @@
 {
   "version": 2,
   "buildCommand": "echo 'No build needed'",
-  "devCommand": "vercel dev",
+  "devCommand": "echo 'Starting dev server'",
   "installCommand": "npm install",
   "framework": null,
   "functions": {
