@@ -1091,14 +1091,56 @@
         }
 
         // 处理登录
-        function handleLogin(event) {
+        async function handleLogin(event) {
             event.preventDefault();
 
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const errorMessage = document.getElementById('errorMessage');
 
-            // 验证账号密码
+            // 先尝试使用API登录
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    // 存储token和用户信息
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('userRole', data.user.role);
+                    localStorage.setItem('username', data.user.username);
+                    errorMessage.style.display = 'none';
+
+                    // 重新加载国家列表和渲染系统选择器
+                    initializeCountries();
+                    renderCountrySelector();
+
+                    // 更新标题
+                    const currentCountry = localStorage.getItem('currentCountry') || 'USA';
+                    document.getElementById('systemTitle').textContent = COUNTRY_CONFIGS[currentCountry].name;
+                    document.getElementById('rulesTitle').textContent = `${COUNTRY_CONFIGS[currentCountry].flag} ${COUNTRY_CONFIGS[currentCountry].label} - 运算规则`;
+
+                    checkLoginStatus();
+                    loadSettings();
+
+                    // 清空输入框
+                    document.getElementById('username').value = '';
+                    document.getElementById('password').value = '';
+
+                    return;
+                }
+            } catch (error) {
+                console.log('API登录失败，尝试使用本地凭证:', error);
+            }
+
+            // 如果API登录失败，回退到硬编码凭证
             const user = CREDENTIALS.find(cred =>
                 cred.username === username && cred.password === btoa(password)
             );
@@ -1181,6 +1223,14 @@
                 return;
             }
 
+            // 获取JWT token
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                errorElement.textContent = '请先登录系统';
+                errorElement.style.display = 'block';
+                return;
+            }
+
             try {
                 submitBtn.disabled = true;
                 submitBtn.textContent = '修改中...';
@@ -1189,7 +1239,8 @@
                 const response = await fetch('/api/users/change-password', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({
                         currentPassword,
