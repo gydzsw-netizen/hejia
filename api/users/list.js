@@ -8,7 +8,7 @@ async function handler(req, res) {
 
   await requireAdmin(req);
 
-  // 获取所有用户（不包含密码hash）
+  // 获取所有用户（包含初始密码，不包含密码hash）
   const result = await sql`
     SELECT
       id,
@@ -16,7 +16,8 @@ async function handler(req, res) {
       role,
       created_at,
       last_login,
-      is_active
+      is_active,
+      initial_password
     FROM users
     ORDER BY created_at DESC
   `;

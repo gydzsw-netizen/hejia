@@ -723,12 +723,14 @@
                             <tr style="background: #f5f5f5; border-bottom: 2px solid #667eea;">
                                 <th style="padding: 12px; text-align: left;">用户名</th>
                                 <th style="padding: 12px; text-align: left;">角色</th>
+                                <th style="padding: 12px; text-align: left;">状态</th>
+                                <th style="padding: 12px; text-align: left;">初始密码</th>
                                 <th style="padding: 12px; text-align: left;">创建时间</th>
                                 <th style="padding: 12px; text-align: center;">操作</th>
                             </tr>
                         </thead>
                         <tbody id="userListBody">
-                            <tr><td colspan="4" style="text-align: center; padding: 20px;">加载中...</td></tr>
+                            <tr><td colspan="6" style="text-align: center; padding: 20px;">加载中...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -1578,16 +1580,28 @@
             const tbody = document.getElementById('userListBody');
 
             if (users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">暂无用户</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;">暂无用户</td></tr>';
                 return;
             }
 
             tbody.innerHTML = users.map(user => {
-                // GYDZ是系统管理员，不能被删除
-                const isSystemAdmin = user.username === 'GYDZ';
+                // GGYDZ和GYDZ是系统管理员，不能被删除或停用
+                const isSystemAdmin = user.username === 'GGYDZ' || user.username === 'GYDZ';
                 const deleteButton = isSystemAdmin
                     ? '<span style="color: #999; font-size: 12px;">系统管理员</span>'
                     : `<button onclick="confirmDeleteUser(${user.id}, '${escapeHtml(user.username)}')" class="btn" style="padding: 6px 12px; background: #dc3545; font-size: 14px;">删除</button>`;
+
+                const toggleButton = isSystemAdmin
+                    ? ''
+                    : `<button onclick="toggleUserActive(${user.id}, ${!user.is_active}, '${escapeHtml(user.username)}')" class="btn" style="padding: 6px 12px; margin-right: 5px; background: ${user.is_active ? '#ff9800' : '#4caf50'}; font-size: 14px;">${user.is_active ? '停用' : '启用'}</button>`;
+
+                const statusBadge = user.is_active
+                    ? '<span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; background: #4caf50; color: white;">正常</span>'
+                    : '<span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; background: #999; color: white;">已停用</span>';
+
+                const initialPassword = user.initial_password
+                    ? `<code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-size: 12px;">${escapeHtml(user.initial_password)}</code>`
+                    : '<span style="color: #999; font-size: 12px;">已修改</span>';
 
                 return `
                     <tr style="border-bottom: 1px solid #e0e0e0;">
@@ -1597,9 +1611,12 @@
                                 ${user.role === 'admin' ? '管理员' : '普通用户'}
                             </span>
                         </td>
+                        <td style="padding: 12px;">${statusBadge}</td>
+                        <td style="padding: 12px;">${initialPassword}</td>
                         <td style="padding: 12px;">${formatDateTime(user.created_at)}</td>
                         <td style="padding: 12px; text-align: center;">
-                            <button onclick="showResetPasswordModal(${user.id}, '${escapeHtml(user.username)}')" class="btn" style="padding: 6px 12px; margin-right: 5px; font-size: 14px;">重置密码</button>
+                            ${toggleButton}
+                            <button onclick="showResetPasswordModal(${user.id}, '${escapeHtml(user.username)}')" class="btn" style="padding: 6px 12px; margin-right: 5px; font-size: 14px;">修改密码</button>
                             ${deleteButton}
                         </td>
                     </tr>
@@ -1753,6 +1770,49 @@
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = '重置密码';
+            }
+        }
+
+        // 停用/启用用户
+        async function toggleUserActive(userId, isActive, username) {
+            const action = isActive ? '启用' : '停用';
+            if (!confirm(`确定要${action}用户 "${username}" 吗？`)) {
+                return;
+            }
+
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                document.getElementById('userManagementError').textContent = '请先登录系统';
+                document.getElementById('userManagementError').style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/users/toggle-active', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ userId, isActive })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('userManagementSuccess').textContent = data.message || `用户${action}成功`;
+                    document.getElementById('userManagementSuccess').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('userManagementSuccess').style.display = 'none';
+                    }, 3000);
+                    loadUserList();
+                } else {
+                    document.getElementById('userManagementError').textContent = data.message || `${action}用户失败`;
+                    document.getElementById('userManagementError').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('userManagementError').textContent = '网络错误，请检查连接后重试';
+                document.getElementById('userManagementError').style.display = 'block';
             }
         }
 
