@@ -37,7 +37,7 @@
 
         .main-content {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
             gap: 15px;
             margin-bottom: 15px;
         }
@@ -658,10 +658,15 @@
                         <p class="info-text">退款损失占销售额的比例</p>
                     </div>
                 </div>
+            </div>
 
-                <div style="margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 6px;">
-                    <strong>计算公式：</strong>
-                    <p style="margin-top: 10px; font-size: 14px; line-height: 1.6;">
+            <!-- 计算公式和国家管理 -->
+            <div class="card">
+                <h2>计算公式与管理</h2>
+
+                <div style="margin-top: 10px; padding: 12px; background: #f5f5f5; border-radius: 6px;">
+                    <strong style="font-size: 13px;">计算公式：</strong>
+                    <p style="margin-top: 8px; font-size: 12px; line-height: 1.5;">
                         销售价格 = (产品成本 + 重量运费 + 体积运费 + 固定成本) × (1 + 利润率) / (1 - 活动占比 - 广告占比 - 退款率占比)
                         <br><br>
                         重量运费 = 实际重量 × 重量运费系数
@@ -675,25 +680,25 @@
                 </div>
 
                 <!-- 国家管理功能（仅管理员可见） -->
-                <div id="countryManagement" class="admin-section" style="margin-top: 20px; padding: 15px; background: #e8f4f8; border-radius: 6px; display: none;">
-                    <strong>国家管理：</strong>
-                    <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
-                        <button id="addCountryBtn" onclick="showAddCountryDialog()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                <div id="countryManagement" class="admin-section" style="margin-top: 15px; padding: 12px; background: #e8f4f8; border-radius: 6px; display: none;">
+                    <strong style="font-size: 13px;">国家管理：</strong>
+                    <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
+                        <button id="addCountryBtn" onclick="showAddCountryDialog()" style="padding: 8px 12px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px;">
                             ➕ 新增国家
                         </button>
-                        <button id="deleteCountryBtn" onclick="showDeleteCountryDialog()" style="padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                        <button id="deleteCountryBtn" onclick="showDeleteCountryDialog()" style="padding: 8px 12px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px;">
                             🗑️ 删除国家
                         </button>
-                        <button id="exportCountryBtn" onclick="exportCountries()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                        <button id="exportCountryBtn" onclick="exportCountries()" style="padding: 8px 12px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px;">
                             📤 导出国家列表
                         </button>
-                        <button onclick="document.getElementById('importFile').click()" style="padding: 10px 20px; background: #17a2b8; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                        <button onclick="document.getElementById('importFile').click()" style="padding: 8px 12px; background: #17a2b8; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px;">
                             📥 导入国家列表
                         </button>
                         <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importCountries(event)">
                     </div>
-                    <p id="importHint" style="margin-top: 10px; font-size: 12px; color: #666; display: none;">提示：请联系管理员获取国家列表文件进行导入</p>
-                    <p id="exportHint" style="margin-top: 10px; font-size: 12px; color: #666;">提示：导出后可分享给其他用户导入，实现跨浏览器同步</p>
+                    <p id="importHint" style="margin-top: 8px; font-size: 11px; color: #666; display: none;">提示：请联系管理员获取国家列表文件进行导入</p>
+                    <p id="exportHint" style="margin-top: 8px; font-size: 11px; color: #666;">提示：导出后可分享给其他用户导入，实现跨浏览器同步</p>
                 </div>
             </div>
 
