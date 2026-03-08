@@ -5,6 +5,11 @@
   "installCommand": "npm install",
   "framework": null,
   "outputDirectory": "public",
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
   "rewrites": [
     {
       "source": "/",
