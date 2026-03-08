@@ -534,11 +534,6 @@
             <div class="card">
                 <h2>产品信息</h2>
                 <div class="form-group">
-                    <label for="productName">产品名称（可选）</label>
-                    <input type="text" id="productName" placeholder="例如: 蓝牙耳机">
-                    <p class="info-text">用于历史记录识别</p>
-                </div>
-                <div class="form-group">
                     <label for="weight">产品重量 (kg)</label>
                     <input type="number" id="weight" placeholder="例如: 2.5" step="0.01" min="0">
                 </div>
@@ -559,6 +554,16 @@
                     <label for="profitRate">利润率 (%)</label>
                     <input type="number" id="profitRate" value="30" step="1" min="0">
                     <p class="info-text">在成本基础上增加的利润百分比</p>
+                </div>
+                <div class="form-group">
+                    <label>活动占比 (%)</label>
+                    <input type="text" id="activityRateDisplay" value="0" readonly style="background: #f5f5f5; cursor: not-allowed;">
+                    <p class="info-text">活动花费占销售额的比例（管理员可在运算规则中修改）</p>
+                </div>
+                <div class="form-group">
+                    <label>广告占比 (%)</label>
+                    <input type="text" id="adRateDisplay" value="0" readonly style="background: #f5f5f5; cursor: not-allowed;">
+                    <p class="info-text">广告花费占销售额的比例（管理员可在运算规则中修改）</p>
                 </div>
                 <button class="btn" onclick="calculatePrice()">计算销售价格</button>
             </div>
@@ -1997,7 +2002,7 @@
 
             // 保存历史记录
             saveCalculationHistory({
-                productName: document.getElementById('productName')?.value || '未命名产品',
+                productName: null,
                 weight: weight,
                 cost: cost,
                 length: length || null,
@@ -2221,6 +2226,28 @@
 
             // 加载历史记录
             refreshHistory();
+
+            // 监听活动占比和广告占比的变化，同步到产品信息栏的只读显示
+            const activityRateInput = document.getElementById('activityRate');
+            const adRateInput = document.getElementById('adRate');
+            const activityRateDisplay = document.getElementById('activityRateDisplay');
+            const adRateDisplay = document.getElementById('adRateDisplay');
+
+            if (activityRateInput && activityRateDisplay) {
+                activityRateInput.addEventListener('input', function() {
+                    activityRateDisplay.value = this.value;
+                });
+                // 初始化显示值
+                activityRateDisplay.value = activityRateInput.value;
+            }
+
+            if (adRateInput && adRateDisplay) {
+                adRateInput.addEventListener('input', function() {
+                    adRateDisplay.value = this.value;
+                });
+                // 初始化显示值
+                adRateDisplay.value = adRateInput.value;
+            }
         };
 
         // 监听其他标签页的localStorage变化（跨标签页同步）
