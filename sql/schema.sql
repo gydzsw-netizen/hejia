@@ -25,6 +25,9 @@ CREATE TABLE IF NOT EXISTS user_settings (
   min_price DECIMAL(10,2) DEFAULT 0.00,
   usd_rate DECIMAL(10,2) DEFAULT 7.20,
   eur_rate DECIMAL(10,2) DEFAULT 7.80,
+  activity_rate DECIMAL(5,2) DEFAULT 0.00,
+  ad_rate DECIMAL(5,2) DEFAULT 0.00,
+  refund_rate DECIMAL(5,2) DEFAULT 0.00,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(user_id)
 );

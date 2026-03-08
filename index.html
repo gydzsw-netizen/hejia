@@ -634,18 +634,35 @@
                         <input type="number" id="eurRate" value="7.8" step="0.01" min="0.01">
                         <p class="info-text">1欧元 = X人民币，用于计算欧元价格</p>
                     </div>
+                    <div class="form-group">
+                        <label for="activityRate">活动占比 (%)</label>
+                        <input type="number" id="activityRate" value="0" step="0.1" min="0" max="100">
+                        <p class="info-text">活动花费占销售额的比例</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="adRate">广告占比 (%)</label>
+                        <input type="number" id="adRate" value="0" step="0.1" min="0" max="100">
+                        <p class="info-text">广告花费占销售额的比例</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="refundRate">退款率占比 (%)</label>
+                        <input type="number" id="refundRate" value="0" step="0.1" min="0" max="100">
+                        <p class="info-text">退款损失占销售额的比例</p>
+                    </div>
                 </div>
 
                 <div style="margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 6px;">
                     <strong>计算公式：</strong>
                     <p style="margin-top: 10px; font-size: 14px; line-height: 1.6;">
-                        销售价格 = (产品成本 + 重量运费 + 体积运费 + 固定成本) × (1 + 利润率)
+                        销售价格 = (产品成本 + 重量运费 + 体积运费 + 固定成本) × (1 + 利润率) / (1 - 活动占比 - 广告占比 - 退款率占比)
                         <br><br>
                         重量运费 = 实际重量 × 重量运费系数
                         <br>
                         体积运费 = 体积重量 × 体积运费系数
                         <br>
                         体积重量 = 长 × 宽 × 高 ÷ 体积系数
+                        <br><br>
+                        <strong>说明：</strong>活动占比、广告占比、退款率占比均为销售额的百分比
                     </p>
                 </div>
 
@@ -1894,6 +1911,9 @@
             const minPrice = parseFloat(document.getElementById('minPrice').value);
             const usdRate = parseFloat(document.getElementById('usdRate').value);
             const eurRate = parseFloat(document.getElementById('eurRate').value);
+            const activityRate = parseFloat(document.getElementById('activityRate').value) / 100;
+            const adRate = parseFloat(document.getElementById('adRate').value) / 100;
+            const refundRate = parseFloat(document.getElementById('refundRate').value) / 100;
 
             // 验证输入
             if (weight <= 0 || cost <= 0) {
@@ -1912,7 +1932,9 @@
             const totalCost = cost + weightShipping + volumeShipping + fixedCost;
 
             // 计算销售价格（人民币）
-            let salePriceCNY = totalCost * (1 + profitRate);
+            // 新公式：销售价格 = 基础成本 × (1 + 利润率) / (1 - 活动占比 - 广告占比 - 退款率占比)
+            const totalRateDeduction = activityRate + adRate + refundRate;
+            let salePriceCNY = totalCost * (1 + profitRate) / (1 - totalRateDeduction);
 
             // 应用最低价格限制
             if (salePriceCNY < minPrice) {
@@ -1941,6 +1963,11 @@
             const userRole = localStorage.getItem('userRole');
 
             if (userRole === 'admin') {
+                // 计算各项占比对应的金额
+                const activityCost = salePriceCNY * activityRate;
+                const adCost = salePriceCNY * adRate;
+                const refundCost = salePriceCNY * refundRate;
+
                 // 管理员：显示完整的运算明细
                 const breakdown = `
                     <div style="text-align: left; font-size: 0.9em;">
@@ -1951,8 +1978,12 @@
                         <p>• 体积运费: ${volumeWeight.toFixed(2)} kg × ¥${volumeRate.toFixed(2)} = ¥${volumeShipping.toFixed(2)}</p>
                         <p>• 固定成本: ¥${fixedCost.toFixed(2)}</p>
                         <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3);"><strong>总成本: ¥${totalCost.toFixed(2)}</strong></p>
-                        <p><strong>利润率: ${(profitRate * 100).toFixed(0)}%</strong></p>
+                        <p><strong>利润率: ${(profitRate * 100).toFixed(1)}%</strong></p>
                         <p><strong>利润金额: ¥${(salePriceCNY - totalCost).toFixed(2)}</strong></p>
+                        <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3);"><strong>销售额占比扣除：</strong></p>
+                        <p>• 活动占比: ${(activityRate * 100).toFixed(1)}% = ¥${activityCost.toFixed(2)}</p>
+                        <p>• 广告占比: ${(adRate * 100).toFixed(1)}% = ¥${adCost.toFixed(2)}</p>
+                        <p>• 退款率占比: ${(refundRate * 100).toFixed(1)}% = ¥${refundCost.toFixed(2)}</p>
                         <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3);"><strong>汇率设置：</strong></p>
                         <p>• 美元汇率: 1 USD = ¥${usdRate.toFixed(2)}</p>
                         <p>• 欧元汇率: 1 EUR = ¥${eurRate.toFixed(2)}</p>
@@ -1986,7 +2017,10 @@
                     fixedCost: fixedCost,
                     minPrice: minPrice,
                     usdRate: usdRate,
-                    eurRate: eurRate
+                    eurRate: eurRate,
+                    activityRate: activityRate * 100,
+                    adRate: adRate * 100,
+                    refundRate: refundRate * 100
                 }
             });
         }
