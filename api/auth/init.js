@@ -19,16 +19,19 @@ async function handler(req, res) {
   }
 
   // 创建初始管理员用户 GYDZ
-  const passwordHash = await bcrypt.hash('Hgyxiaoyu1314.', BCRYPT_ROUNDS);
+  const gydz_passwordHash = await bcrypt.hash('Hgyxiaoyu1314.', BCRYPT_ROUNDS);
+  const staff_passwordHash = await bcrypt.hash('Staff2024', BCRYPT_ROUNDS);
 
   await sql`
     INSERT INTO users (username, password_hash, role, is_active)
-    VALUES ('GYDZ', ${passwordHash}, 'admin', true)
+    VALUES
+      ('GYDZ', ${gydz_passwordHash}, 'admin', true),
+      ('STAFF', ${staff_passwordHash}, 'employee', true)
   `;
 
   return res.status(200).json({
     success: true,
-    message: '系统初始化成功，已创建管理员账户 GYDZ'
+    message: '系统初始化成功，已创建管理员账户 GYDZ 和员工账户 STAFF'
   });
 }
 
