@@ -667,33 +667,6 @@
                 </div>
             </div>
 
-            <!-- 修改密码对话框 -->
-            <div id="changePasswordDialog" class="dialog-overlay" style="display: none;">
-                <div class="dialog-box">
-                    <h3>修改密码</h3>
-                    <form id="changePasswordForm" onsubmit="handleChangePassword(event)">
-                        <div class="form-group">
-                            <label for="currentPassword">当前密码</label>
-                            <input type="password" id="currentPassword" placeholder="请输入当前密码" required />
-                        </div>
-                        <div class="form-group">
-                            <label for="newPassword">新密码（至少8个字符）</label>
-                            <input type="password" id="newPassword" placeholder="请输入新密码" required minlength="8" />
-                        </div>
-                        <div class="form-group">
-                            <label for="confirmPassword">确认新密码</label>
-                            <input type="password" id="confirmPassword" placeholder="请再次输入新密码" required minlength="8" />
-                        </div>
-                        <div id="changePasswordError" class="error-message" style="color: #dc3545; margin-bottom: 10px; display: none;"></div>
-                        <div id="changePasswordSuccess" class="success-message" style="color: #28a745; margin-bottom: 10px; display: none;"></div>
-                        <div style="display: flex; gap: 10px; margin-top: 20px;">
-                            <button type="submit" class="btn" style="flex: 1;" id="changePasswordBtn">确认修改</button>
-                            <button type="button" onclick="closeChangePasswordDialog()" class="btn" style="flex: 1; background: #999;">取消</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
             <!-- 计算结果 -->
             <div class="card result-card">
                 <h2>计算结果</h2>
@@ -723,6 +696,33 @@
             </div>
         </div>
         </div> <!-- 结束 calculatorSection -->
+    </div>
+
+    <!-- 修改密码对话框 -->
+    <div id="changePasswordDialog" class="dialog-overlay" style="display: none;">
+        <div class="dialog-box">
+            <h3>修改密码</h3>
+            <form id="changePasswordForm" onsubmit="handleChangePassword(event)">
+                <div class="form-group">
+                    <label for="currentPassword">当前密码</label>
+                    <input type="password" id="currentPassword" placeholder="请输入当前密码" required />
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">新密码（至少8个字符）</label>
+                    <input type="password" id="newPassword" placeholder="请输入新密码" required minlength="8" />
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">确认新密码</label>
+                    <input type="password" id="confirmPassword" placeholder="请再次输入新密码" required minlength="8" />
+                </div>
+                <div id="changePasswordError" class="error-message" style="color: #dc3545; margin-bottom: 10px; display: none;"></div>
+                <div id="changePasswordSuccess" class="success-message" style="color: #28a745; margin-bottom: 10px; display: none;"></div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn" style="flex: 1;" id="changePasswordBtn">确认修改</button>
+                    <button type="button" onclick="closeChangePasswordDialog()" class="btn" style="flex: 1; background: #999;">取消</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script>
