@@ -505,6 +505,11 @@
                     <div class="menu-title">价格核算</div>
                     <div class="menu-desc">多国家价格计算系统</div>
                 </button>
+                <button class="menu-btn" onclick="showChangePasswordModal()">
+                    <div class="menu-icon">🔒</div>
+                    <div class="menu-title">修改密码</div>
+                    <div class="menu-desc">更改账号密码</div>
+                </button>
             </div>
         </div>
 
@@ -659,6 +664,33 @@
                     <div style="display: flex; gap: 10px; margin-top: 20px;">
                         <button onclick="closeDeleteCountryDialog()" class="btn" style="flex: 1; background: #999;">关闭</button>
                     </div>
+                </div>
+            </div>
+
+            <!-- 修改密码对话框 -->
+            <div id="changePasswordDialog" class="dialog-overlay" style="display: none;">
+                <div class="dialog-box">
+                    <h3>修改密码</h3>
+                    <form id="changePasswordForm" onsubmit="handleChangePassword(event)">
+                        <div class="form-group">
+                            <label for="currentPassword">当前密码</label>
+                            <input type="password" id="currentPassword" placeholder="请输入当前密码" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">新密码（至少8个字符）</label>
+                            <input type="password" id="newPassword" placeholder="请输入新密码" required minlength="8" />
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">确认新密码</label>
+                            <input type="password" id="confirmPassword" placeholder="请再次输入新密码" required minlength="8" />
+                        </div>
+                        <div id="changePasswordError" class="error-message" style="color: #dc3545; margin-bottom: 10px; display: none;"></div>
+                        <div id="changePasswordSuccess" class="success-message" style="color: #28a745; margin-bottom: 10px; display: none;"></div>
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button type="submit" class="btn" style="flex: 1;" id="changePasswordBtn">确认修改</button>
+                            <button type="button" onclick="closeChangePasswordDialog()" class="btn" style="flex: 1; background: #999;">取消</button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
@@ -1104,6 +1136,88 @@
                 localStorage.removeItem('userRole');
                 localStorage.removeItem('username');
                 checkLoginStatus();
+            }
+        }
+
+        // 显示修改密码对话框
+        function showChangePasswordModal() {
+            document.getElementById('changePasswordDialog').style.display = 'flex';
+            document.getElementById('changePasswordForm').reset();
+            document.getElementById('changePasswordError').style.display = 'none';
+            document.getElementById('changePasswordSuccess').style.display = 'none';
+        }
+
+        // 关闭修改密码对话框
+        function closeChangePasswordDialog() {
+            document.getElementById('changePasswordDialog').style.display = 'none';
+        }
+
+        // 处理修改密码
+        async function handleChangePassword(event) {
+            event.preventDefault();
+
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const errorElement = document.getElementById('changePasswordError');
+            const successElement = document.getElementById('changePasswordSuccess');
+            const submitBtn = document.getElementById('changePasswordBtn');
+
+            // 隐藏之前的消息
+            errorElement.style.display = 'none';
+            successElement.style.display = 'none';
+
+            // 验证新密码和确认密码是否一致
+            if (newPassword !== confirmPassword) {
+                errorElement.textContent = '新密码和确认密码不一致';
+                errorElement.style.display = 'block';
+                return;
+            }
+
+            // 验证密码长度
+            if (newPassword.length < 8) {
+                errorElement.textContent = '新密码长度至少为8个字符';
+                errorElement.style.display = 'block';
+                return;
+            }
+
+            try {
+                submitBtn.disabled = true;
+                submitBtn.textContent = '修改中...';
+
+                // 调用API修改密码
+                const response = await fetch('/api/users/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        currentPassword,
+                        newPassword
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    successElement.textContent = '密码修改成功！请使用新密码重新登录。';
+                    successElement.style.display = 'block';
+
+                    // 3秒后自动登出
+                    setTimeout(() => {
+                        closeChangePasswordDialog();
+                        handleLogout();
+                    }, 3000);
+                } else {
+                    errorElement.textContent = data.message || '密码修改失败，请重试';
+                    errorElement.style.display = 'block';
+                }
+            } catch (error) {
+                errorElement.textContent = '网络错误，请检查连接后重试';
+                errorElement.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '确认修改';
             }
         }
 
