@@ -23,6 +23,13 @@ async function handler(req, res) {
     throw new Error('用户不存在');
   }
 
+  const user = userCheck.rows[0];
+
+  // 保护GYDZ用户，禁止删除
+  if (user.username === 'GYDZ') {
+    throw new Error('GYDZ是系统管理员，不能被删除');
+  }
+
   // 删除用户
   await sql`
     DELETE FROM users WHERE id = ${userId}

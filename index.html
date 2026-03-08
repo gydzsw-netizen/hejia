@@ -1512,21 +1512,29 @@
                 return;
             }
 
-            tbody.innerHTML = users.map(user => `
-                <tr style="border-bottom: 1px solid #e0e0e0;">
-                    <td style="padding: 12px;">${escapeHtml(user.username)}</td>
-                    <td style="padding: 12px;">
-                        <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; ${user.role === 'admin' ? 'background: #ff9800; color: white;' : 'background: #4caf50; color: white;'}">
-                            ${user.role === 'admin' ? '管理员' : '普通用户'}
-                        </span>
-                    </td>
-                    <td style="padding: 12px;">${formatDateTime(user.created_at)}</td>
-                    <td style="padding: 12px; text-align: center;">
-                        <button onclick="showResetPasswordModal(${user.id}, '${escapeHtml(user.username)}')" class="btn" style="padding: 6px 12px; margin-right: 5px; font-size: 14px;">重置密码</button>
-                        <button onclick="confirmDeleteUser(${user.id}, '${escapeHtml(user.username)}')" class="btn" style="padding: 6px 12px; background: #dc3545; font-size: 14px;">删除</button>
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = users.map(user => {
+                // GYDZ是系统管理员，不能被删除
+                const isSystemAdmin = user.username === 'GYDZ';
+                const deleteButton = isSystemAdmin
+                    ? '<span style="color: #999; font-size: 12px;">系统管理员</span>'
+                    : `<button onclick="confirmDeleteUser(${user.id}, '${escapeHtml(user.username)}')" class="btn" style="padding: 6px 12px; background: #dc3545; font-size: 14px;">删除</button>`;
+
+                return `
+                    <tr style="border-bottom: 1px solid #e0e0e0;">
+                        <td style="padding: 12px;">${escapeHtml(user.username)}</td>
+                        <td style="padding: 12px;">
+                            <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; ${user.role === 'admin' ? 'background: #ff9800; color: white;' : 'background: #4caf50; color: white;'}">
+                                ${user.role === 'admin' ? '管理员' : '普通用户'}
+                            </span>
+                        </td>
+                        <td style="padding: 12px;">${formatDateTime(user.created_at)}</td>
+                        <td style="padding: 12px; text-align: center;">
+                            <button onclick="showResetPasswordModal(${user.id}, '${escapeHtml(user.username)}')" class="btn" style="padding: 6px 12px; margin-right: 5px; font-size: 14px;">重置密码</button>
+                            ${deleteButton}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         // 转义HTML
