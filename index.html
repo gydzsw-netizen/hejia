@@ -1297,12 +1297,17 @@
                         formulaCard.style.display = 'none';
                     }
 
-                    // 放大剩余的两个板块，占据网页80%
+                    // 调整grid布局为6列，放大板块尺寸（增加50%）
+                    const mainContent = document.querySelector('.main-content');
+                    if (mainContent) {
+                        mainContent.style.gridTemplateColumns = '1fr 1fr 1fr 1fr 1fr 1fr';
+                    }
+
                     const productCard = document.getElementById('productCard');
                     if (productCard) {
-                        productCard.style.gridColumn = 'span 2';
+                        productCard.style.gridColumn = 'span 3';
                     }
-                    resultCard.style.gridColumn = 'span 2';
+                    resultCard.style.gridColumn = 'span 3';
 
                     // 隐藏用户管理按钮
                     const userManagementBtn = document.getElementById('userManagementBtn');
