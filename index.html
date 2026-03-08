@@ -37,7 +37,7 @@
 
         .main-content {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 15px;
             margin-bottom: 15px;
         }
@@ -572,7 +572,7 @@
             </div>
 
             <!-- 计算结果 -->
-            <div class="card result-card" style="grid-column: auto;">
+            <div class="card result-card">
                 <h2>计算结果</h2>
                 <div class="result-display">
                     <div class="label">建议销售价格</div>
@@ -600,7 +600,7 @@
             </div>
 
             <!-- 运算规则配置 -->
-            <div class="card" id="rulesCard" style="grid-column: 1 / -1;">
+            <div class="card" id="rulesCard">
                 <div class="admin-toggle">
                     <button onclick="toggleAdmin()">管理员设置</button>
                 </div>
