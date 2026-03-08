@@ -39,9 +39,9 @@ async function handler(req, res) {
 
   // 创建用户
   const result = await sql`
-    INSERT INTO users (username, password_hash, role, initial_password)
-    VALUES (${username}, ${passwordHash}, ${role}, ${password})
-    RETURNING id, username, role, created_at, is_active, initial_password
+    INSERT INTO users (username, password_hash, role)
+    VALUES (${username}, ${passwordHash}, ${role})
+    RETURNING id, username, role, created_at, is_active
   `;
 
   return res.status(201).json({

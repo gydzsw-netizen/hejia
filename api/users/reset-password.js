@@ -33,12 +33,10 @@ async function handler(req, res) {
   // 加密新密码
   const passwordHash = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
 
-  // 更新密码，同时更新initial_password字段
+  // 更新密码
   await sql`
     UPDATE users
-    SET password_hash = ${passwordHash},
-        initial_password = ${newPassword},
-        updated_at = CURRENT_TIMESTAMP
+    SET password_hash = ${passwordHash}, updated_at = CURRENT_TIMESTAMP
     WHERE id = ${userId}
   `;
 
