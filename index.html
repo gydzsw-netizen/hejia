@@ -510,6 +510,11 @@
                     <div class="menu-title">修改密码</div>
                     <div class="menu-desc">更改账号密码</div>
                 </button>
+                <button class="menu-btn" id="userManagementBtn" onclick="showCreateUserModal()" style="display: none;">
+                    <div class="menu-icon">👥</div>
+                    <div class="menu-title">用户管理</div>
+                    <div class="menu-desc">创建和管理用户</div>
+                </button>
             </div>
         </div>
 
@@ -720,6 +725,36 @@
                 <div style="display: flex; gap: 10px; margin-top: 20px;">
                     <button type="submit" class="btn" style="flex: 1;" id="changePasswordBtn">确认修改</button>
                     <button type="button" onclick="closeChangePasswordDialog()" class="btn" style="flex: 1; background: #999;">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 创建用户对话框 -->
+    <div id="createUserDialog" class="dialog-overlay" style="display: none;">
+        <div class="dialog-box">
+            <h3>创建新用户</h3>
+            <form id="createUserForm" onsubmit="handleCreateUser(event)">
+                <div class="form-group">
+                    <label for="newUsername">用户名</label>
+                    <input type="text" id="newUsername" placeholder="请输入用户名" required />
+                </div>
+                <div class="form-group">
+                    <label for="newUserPassword">密码（至少8个字符）</label>
+                    <input type="password" id="newUserPassword" placeholder="请输入密码" required minlength="8" />
+                </div>
+                <div class="form-group">
+                    <label for="newUserRole">角色</label>
+                    <select id="newUserRole" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 16px;">
+                        <option value="user">普通用户</option>
+                        <option value="admin">管理员</option>
+                    </select>
+                </div>
+                <div id="createUserError" class="error-message" style="color: #dc3545; margin-bottom: 10px; display: none;"></div>
+                <div id="createUserSuccess" class="success-message" style="color: #28a745; margin-bottom: 10px; display: none;"></div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn" style="flex: 1;" id="createUserBtn">创建用户</button>
+                    <button type="button" onclick="closeCreateUserDialog()" class="btn" style="flex: 1; background: #999;">取消</button>
                 </div>
             </form>
         </div>
@@ -1044,6 +1079,12 @@
                     rulesCard.style.display = 'block';
                     resultCard.style.gridColumn = '1 / -1';
 
+                    // 显示用户管理按钮
+                    const userManagementBtn = document.getElementById('userManagementBtn');
+                    if (userManagementBtn) {
+                        userManagementBtn.style.display = 'block';
+                    }
+
                     // 显示国家管理功能，显示所有按钮
                     document.getElementById('countryManagement').style.display = 'block';
                     document.getElementById('addCountryBtn').style.display = 'inline-block';
@@ -1057,6 +1098,12 @@
                     // 普通员工：隐藏运算规则配置卡片，计算结果与产品信息并排
                     rulesCard.style.display = 'none';
                     resultCard.style.gridColumn = 'auto';
+
+                    // 隐藏用户管理按钮
+                    const userManagementBtn = document.getElementById('userManagementBtn');
+                    if (userManagementBtn) {
+                        userManagementBtn.style.display = 'none';
+                    }
 
                     // 显示国家管理功能，但只显示导入按钮
                     document.getElementById('countryManagement').style.display = 'block';
@@ -1269,6 +1316,96 @@
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = '确认修改';
+            }
+        }
+
+        // 显示创建用户对话框
+        function showCreateUserModal() {
+            document.getElementById('createUserDialog').style.display = 'flex';
+            document.getElementById('createUserForm').reset();
+            document.getElementById('createUserError').style.display = 'none';
+            document.getElementById('createUserSuccess').style.display = 'none';
+        }
+
+        // 关闭创建用户对话框
+        function closeCreateUserDialog() {
+            document.getElementById('createUserDialog').style.display = 'none';
+        }
+
+        // 处理创建用户
+        async function handleCreateUser(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('newUsername').value.trim();
+            const password = document.getElementById('newUserPassword').value;
+            const role = document.getElementById('newUserRole').value;
+            const errorElement = document.getElementById('createUserError');
+            const successElement = document.getElementById('createUserSuccess');
+            const submitBtn = document.getElementById('createUserBtn');
+
+            // 隐藏之前的消息
+            errorElement.style.display = 'none';
+            successElement.style.display = 'none';
+
+            // 验证输入
+            if (!username || !password) {
+                errorElement.textContent = '用户名和密码不能为空';
+                errorElement.style.display = 'block';
+                return;
+            }
+
+            if (password.length < 8) {
+                errorElement.textContent = '密码长度至少为8个字符';
+                errorElement.style.display = 'block';
+                return;
+            }
+
+            // 获取JWT token
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                errorElement.textContent = '请先登录系统';
+                errorElement.style.display = 'block';
+                return;
+            }
+
+            try {
+                submitBtn.disabled = true;
+                submitBtn.textContent = '创建中...';
+
+                // 调用API创建用户
+                const response = await fetch('/api/users/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        username,
+                        password,
+                        role
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    successElement.textContent = `用户 ${username} 创建成功！`;
+                    successElement.style.display = 'block';
+
+                    // 2秒后关闭对话框
+                    setTimeout(() => {
+                        closeCreateUserDialog();
+                    }, 2000);
+                } else {
+                    errorElement.textContent = data.message || '创建用户失败，请重试';
+                    errorElement.style.display = 'block';
+                }
+            } catch (error) {
+                errorElement.textContent = '网络错误，请检查连接后重试';
+                errorElement.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '创建用户';
             }
         }
 
