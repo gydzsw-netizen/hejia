@@ -1823,6 +1823,12 @@
             const successElement = document.getElementById('resetPasswordSuccess');
             const submitBtn = document.getElementById('resetPasswordBtn');
 
+            // 检查元素是否存在
+            if (!submitBtn || !errorElement || !successElement) {
+                console.error('重置密码对话框元素未找到');
+                return;
+            }
+
             // 隐藏之前的消息
             errorElement.style.display = 'none';
             successElement.style.display = 'none';
@@ -1843,8 +1849,10 @@
             }
 
             try {
-                submitBtn.disabled = true;
-                submitBtn.textContent = '重置中...';
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = '重置中...';
+                }
 
                 // 调用API重置密码
                 const response = await fetch('/api/users/reset-password', {
@@ -1865,6 +1873,9 @@
                     successElement.textContent = '密码重置成功！';
                     successElement.style.display = 'block';
 
+                    // 刷新用户列表
+                    loadUserList();
+
                     // 2秒后关闭对话框
                     setTimeout(() => {
                         closeResetPasswordDialog();
@@ -1874,11 +1885,13 @@
                     errorElement.style.display = 'block';
                 }
             } catch (error) {
-                errorElement.textContent = '网络错误，请检查连接后重试';
+                errorElement.textContent = '网络错误：' + error.message;
                 errorElement.style.display = 'block';
             } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = '重置密码';
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '重置密码';
+                }
             }
         }
 
