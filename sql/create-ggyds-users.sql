@@ -10,6 +10,7 @@ VALUES ('GGYDZ', '$2b$12$ENN75zZk7tvnEI2YCqOQeezhEYhPy0J2FGFYzoccJ/VhSQT3DcVYG',
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: SSTAFF, 密码: Staff2024
@@ -18,6 +19,7 @@ VALUES ('SSTAFF', '$2b$12$10EEGydIO8k8Yoc9OnUH/.1QpocmnAiI1xu79cmL7A2eNHzmYdmnm'
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: GGYDS01, 密码: 9gQM!!jgJx3E
@@ -26,6 +28,7 @@ VALUES ('GGYDS01', '$2b$12$1uhjrhV3X6s/UKZ6f1.xCOF3k6duug7PUFhHW0Aaki.Do/VULXAqC
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: GGYDS02, 密码: fDU5j7q6pQoU
@@ -34,6 +37,7 @@ VALUES ('GGYDS02', '$2b$12$VtySsQ6lCdoZaByxlgyZ4O2E2d8jd/bX4uJvl2vaf5eo.bqAxboIS
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: GGYDS03, 密码: SeZUMp8GtDLL
@@ -42,6 +46,7 @@ VALUES ('GGYDS03', '$2b$12$sEDACXvK3FB9TA8ZSAQ6UOPq/bZBFceNDUplFvysWbP9CmLmMBXRq
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: GGYDS04, 密码: Zsmrm668hc2V
@@ -50,6 +55,7 @@ VALUES ('GGYDS04', '$2b$12$yB4U.dY/FQkfOAnZDK0JkeEgYknPNP2bdS2CaCxlYEj7w0rODELte
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: GGYDS05, 密码: hR4Z6SnQst5z
@@ -58,6 +64,7 @@ VALUES ('GGYDS05', '$2b$12$vjacimfH6DGgQGrm3B4fPuRWzo1UIGtdeFbAXZFcLD/x3kAvoKd3O
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: GGYDS06, 密码: JtxaoLsUMiF9
@@ -66,6 +73,7 @@ VALUES ('GGYDS06', '$2b$12$iX3nKgWtG3LerZfBPYrBFO/PdUqWPgyG99hNiHGDjU5R0TjPdWNtG
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: GGYDS07, 密码: ogFoBFMGFEG2
@@ -74,6 +82,7 @@ VALUES ('GGYDS07', '$2b$12$suMQDG3DqFVm2njen6CBfOwDgcKbkdC8wngZk7S8BhviOOM0mul6O
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: GGYDS08, 密码: jJFNSTZjT7HS
@@ -82,6 +91,7 @@ VALUES ('GGYDS08', '$2b$12$qUkJJCLJD.rI3wwN43Yy/eYOm3Z1MyxKp18ssDBBoZsw3vtfR2zCe
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: GGYDS09, 密码: sZDzA54#@RnD
@@ -90,6 +100,7 @@ VALUES ('GGYDS09', '$2b$12$IjlAVmsPr01UCb.8yclTaON/2j2cz6Dnr6E1BMuI6WkHRFbEnIxQu
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: GGYDS10, 密码: Q7zFw8yb2U@e
@@ -98,6 +109,7 @@ VALUES ('GGYDS10', '$2b$12$Fr/TcJuQU525W4z9f1uDwe84UJwVNa3pgUuHrNETBtZsHGdUGGxmK
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: GGYDS11, 密码: gtDVdmT2VgKs
@@ -106,6 +118,7 @@ VALUES ('GGYDS11', '$2b$12$jDKL1WD3R2W2WSxmhet8GOXNzdelPlC1U58hPvXJpit.Gb2nAxv62
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: GGYDS12, 密码: @LW92odHWmnj
@@ -114,6 +127,7 @@ VALUES ('GGYDS12', '$2b$12$jhaERNd3e45PMQPYWP5oT.LySf6V7/OZgzt8wCV4xRs1gx0iGx3gW
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: GGYDS13, 密码: fm9BAKXDro4D
@@ -122,6 +136,7 @@ VALUES ('GGYDS13', '$2b$12$rYhj0ZEUM4hnZQ8akt1UsuawcxUmV6auHsqrGuN4188db76zkNWta
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: GGYDS14, 密码: 2f67DRPuA!#S
@@ -130,6 +145,7 @@ VALUES ('GGYDS14', '$2b$12$3Uh/YSWYReIijJNX3ZqBg.v5x0Bp3kNZdB28loyFf88dc9Fs9YqOO
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: GGYDS15, 密码: 6TC%3c#Z$au6
@@ -138,6 +154,7 @@ VALUES ('GGYDS15', '$2b$12$BZCxZkNi82osvj64cWe/YOciKvoxBN.oqD2yeEMAxR7V9iAKk7Kb6
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: GGYDS16, 密码: 4wc5fxw3do@B
@@ -146,6 +163,7 @@ VALUES ('GGYDS16', '$2b$12$kE76LTc/6czTJAtmFnUbyOMCvtr0A.89h31UKaGXw90X4THqAbgrm
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: GGYDS17, 密码: CzqKDez@rT5Q
@@ -154,6 +172,7 @@ VALUES ('GGYDS17', '$2b$12$kpQeBuOYLuS7nHJffsgckeN90XfOZeE3lOmTxhDf0aL/TLiGlpdH2
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: GGYDS18, 密码: eexET$VHr932
@@ -162,6 +181,7 @@ VALUES ('GGYDS18', '$2b$12$gav5H5aXPYz0bagQNZkvbOok01BFssJzR/yCeiHFg2r6EOv94CPYu
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: GGYDS19, 密码: oCNr4mzyHXNK
@@ -170,6 +190,7 @@ VALUES ('GGYDS19', '$2b$12$EP/rryfvwR7XHx.rpOxVKe90nN6.h4UfOnV0iHYAgk4X.8FolMJdW
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
 -- 普通用户: GGYDS20, 密码: B%zbdijoQJRD
@@ -178,5 +199,6 @@ VALUES ('GGYDS20', '$2b$12$5tgWq/XHIj04YHgai1zInupdnfFasDtGvCBso.kkaBW5H2ftVFL.y
 ON CONFLICT (username) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
   initial_password = EXCLUDED.initial_password,
+  is_active = true,
   updated_at = CURRENT_TIMESTAMP;
 
