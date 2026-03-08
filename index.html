@@ -730,35 +730,6 @@
                 </div>
             </div>
 
-            <!-- 历史记录 -->
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 style="margin-bottom: 0;">📋 计算历史记录</h2>
-                    <button onclick="refreshHistory()" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">刷新</button>
-                </div>
-
-                <div style="margin-bottom: 15px;">
-                    <input type="text" id="historySearch" placeholder="搜索产品名称..." style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px;" onkeyup="searchHistory()">
-                </div>
-
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="background: #f5f5f5; border-bottom: 2px solid #667eea;">
-                                <th style="padding: 12px; text-align: left;">时间</th>
-                                <th style="padding: 12px; text-align: left;">产品名称</th>
-                                <th style="padding: 12px; text-align: left;">重量</th>
-                                <th style="padding: 12px; text-align: left;">成本</th>
-                                <th style="padding: 12px; text-align: left;">销售价格</th>
-                                <th style="padding: 12px; text-align: center;">操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historyListBody">
-                            <tr><td colspan="6" style="text-align: center; padding: 20px; color: #999;">暂无历史记录</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
         </div> <!-- 结束 calculatorSection -->
 
