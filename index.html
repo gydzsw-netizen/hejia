@@ -15,7 +15,8 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 15px;
+            font-size: 14px;
         }
 
         .container {
@@ -26,53 +27,54 @@
         .header {
             text-align: center;
             color: white;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
         }
 
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 1.8em;
+            margin-bottom: 5px;
         }
 
         .main-content {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
         }
 
         .card {
             background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
 
         .card h2 {
             color: #333;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-            border-bottom: 3px solid #667eea;
-            padding-bottom: 10px;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 6px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             color: #555;
             font-weight: 500;
+            font-size: 13px;
         }
 
         .form-group input {
             width: 100%;
-            padding: 12px;
+            padding: 8px;
             border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 16px;
+            border-radius: 4px;
+            font-size: 14px;
             transition: border-color 0.3s;
         }
 
@@ -89,12 +91,12 @@
 
         .btn {
             width: 100%;
-            padding: 15px;
+            padding: 10px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 6px;
-            font-size: 18px;
+            border-radius: 4px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
@@ -122,56 +124,56 @@
 
         .result-display {
             text-align: center;
-            padding: 30px;
+            padding: 15px;
         }
 
         .result-display .price {
-            font-size: 4em;
+            font-size: 3em;
             font-weight: bold;
-            margin: 20px 0;
+            margin: 10px 0;
         }
 
         .result-display .label {
-            font-size: 1.2em;
+            font-size: 1em;
             opacity: 0.9;
         }
 
         .multi-currency {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin: 20px 0;
+            gap: 12px;
+            margin: 12px 0;
         }
 
         .currency-box {
             background: rgba(255, 255, 255, 0.15);
-            padding: 20px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 6px;
             text-align: center;
         }
 
         .currency-label {
-            font-size: 1em;
+            font-size: 0.85em;
             opacity: 0.9;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
         }
 
         .currency-price {
-            font-size: 2.5em;
+            font-size: 1.8em;
             font-weight: bold;
         }
 
         .currency-profit {
-            font-size: 1.2em;
-            margin-top: 10px;
+            font-size: 0.95em;
+            margin-top: 6px;
             opacity: 0.85;
         }
 
         .formula-section {
             background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 12px;
         }
 
         .formula-group {
@@ -205,9 +207,10 @@
         }
 
         .info-text {
-            font-size: 0.9em;
+            font-size: 0.75em;
             color: #666;
-            margin-top: 5px;
+            margin-top: 3px;
+            line-height: 1.3;
         }
 
         /* 登录界面样式 */
@@ -569,7 +572,7 @@
             </div>
 
             <!-- 计算结果 -->
-            <div class="card result-card" style="grid-column: auto;">
+            <div class="card result-card">
                 <h2>计算结果</h2>
                 <div class="result-display">
                     <div class="label">建议销售价格</div>
@@ -597,7 +600,7 @@
             </div>
 
             <!-- 运算规则配置 -->
-            <div class="card" id="rulesCard" style="grid-column: 1 / -1;">
+            <div class="card" id="rulesCard">
                 <div class="admin-toggle">
                     <button onclick="toggleAdmin()">管理员设置</button>
                 </div>
@@ -655,10 +658,15 @@
                         <p class="info-text">退款损失占销售额的比例</p>
                     </div>
                 </div>
+            </div>
 
-                <div style="margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 6px;">
-                    <strong>计算公式：</strong>
-                    <p style="margin-top: 10px; font-size: 14px; line-height: 1.6;">
+            <!-- 计算公式和国家管理 -->
+            <div class="card">
+                <h2>计算公式与管理</h2>
+
+                <div style="margin-top: 10px; padding: 12px; background: #f5f5f5; border-radius: 6px;">
+                    <strong style="font-size: 13px;">计算公式：</strong>
+                    <p style="margin-top: 8px; font-size: 12px; line-height: 1.5;">
                         销售价格 = (产品成本 + 重量运费 + 体积运费 + 固定成本) × (1 + 利润率) / (1 - 活动占比 - 广告占比 - 退款率占比)
                         <br><br>
                         重量运费 = 实际重量 × 重量运费系数
@@ -672,25 +680,25 @@
                 </div>
 
                 <!-- 国家管理功能（仅管理员可见） -->
-                <div id="countryManagement" class="admin-section" style="margin-top: 20px; padding: 15px; background: #e8f4f8; border-radius: 6px; display: none;">
-                    <strong>国家管理：</strong>
-                    <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
-                        <button id="addCountryBtn" onclick="showAddCountryDialog()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                <div id="countryManagement" class="admin-section" style="margin-top: 15px; padding: 12px; background: #e8f4f8; border-radius: 6px; display: none;">
+                    <strong style="font-size: 13px;">国家管理：</strong>
+                    <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
+                        <button id="addCountryBtn" onclick="showAddCountryDialog()" style="padding: 8px 12px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px;">
                             ➕ 新增国家
                         </button>
-                        <button id="deleteCountryBtn" onclick="showDeleteCountryDialog()" style="padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                        <button id="deleteCountryBtn" onclick="showDeleteCountryDialog()" style="padding: 8px 12px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px;">
                             🗑️ 删除国家
                         </button>
-                        <button id="exportCountryBtn" onclick="exportCountries()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                        <button id="exportCountryBtn" onclick="exportCountries()" style="padding: 8px 12px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px;">
                             📤 导出国家列表
                         </button>
-                        <button onclick="document.getElementById('importFile').click()" style="padding: 10px 20px; background: #17a2b8; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                        <button onclick="document.getElementById('importFile').click()" style="padding: 8px 12px; background: #17a2b8; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px;">
                             📥 导入国家列表
                         </button>
                         <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importCountries(event)">
                     </div>
-                    <p id="importHint" style="margin-top: 10px; font-size: 12px; color: #666; display: none;">提示：请联系管理员获取国家列表文件进行导入</p>
-                    <p id="exportHint" style="margin-top: 10px; font-size: 12px; color: #666;">提示：导出后可分享给其他用户导入，实现跨浏览器同步</p>
+                    <p id="importHint" style="margin-top: 8px; font-size: 11px; color: #666; display: none;">提示：请联系管理员获取国家列表文件进行导入</p>
+                    <p id="exportHint" style="margin-top: 8px; font-size: 11px; color: #666;">提示：导出后可分享给其他用户导入，实现跨浏览器同步</p>
                 </div>
             </div>
 
