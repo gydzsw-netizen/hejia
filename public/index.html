@@ -57,8 +57,8 @@
 
                 await login(username, password);
 
-                // 登录成功，重定向到计算器页面
-                window.location.href = '/calculator.html';
+                // 登录成功，重定向到主页面
+                window.location.href = '/home.html';
             } catch (error) {
                 errorMessage.textContent = error.message || '登录失败，请重试';
                 loginBtn.disabled = false;

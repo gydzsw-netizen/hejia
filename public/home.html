@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主页 - 销售价格核算系统</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .menu-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 60vh;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .menu-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .menu-card-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .menu-card-title {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .menu-card-description {
+            font-size: 1em;
+            color: #666;
+        }
+
+        .menu-card.calculator {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .menu-card.calculator .menu-card-title,
+        .menu-card.calculator .menu-card-description {
+            color: white;
+        }
+
+        .menu-card.admin {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .menu-card.admin .menu-card-title,
+        .menu-card.admin .menu-card-description {
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>销售价格核算系统</h1>
+            <div class="user-info">
+                <span class="username">用户：<span id="username"></span></span>
+                <button id="logoutBtn" class="logout-btn">登出</button>
+            </div>
+        </div>
+
+        <div class="menu-container">
+            <div class="menu-grid">
+                <a href="/calculator.html" class="menu-card calculator">
+                    <div class="menu-card-icon">💰</div>
+                    <div class="menu-card-title">价格核算</div>
+                    <div class="menu-card-description">计算产品销售价格</div>
+                </a>
+
+                <a href="/admin.html" class="menu-card admin" id="adminCard">
+                    <div class="menu-card-icon">⚙️</div>
+                    <div class="menu-card-title">系统管理</div>
+                    <div class="menu-card-description">用户管理和系统设置</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { checkAuth, logout } from '/js/auth.js';
+
+        // 页面加载时检查认证
+        window.addEventListener('DOMContentLoaded', async () => {
+            const user = await checkAuth();
+    if (user) {
+                document.getElementById('username').textContent = user.username;
+
+                // 如果不是管理员，隐藏系统管理按钮
+                if (!user.isAdmin) {
+                    document.getElementById('adminCard').style.display = 'none';
+                }
+            }
+        });
+
+        // 登出按钮
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await logout();
+            window.location.href = '/index.html';
+        });
+    </script>
+</body>
+</html>
