@@ -54,6 +54,17 @@
             <div class="card">
                 <h2>产品信息</h2>
                 <div class="form-group">
+                    <label for="country">选择国家</label>
+                    <select id="country" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 16px; cursor: pointer;">
+                        <option value="US">🇺🇸 美国</option>
+                        <option value="DE">🇩🇪 德国</option>
+                        <option value="GB">🇬🇧 英国</option>
+                        <option value="FR">🇫🇷 法国</option>
+                        <option value="EU">🇪🇺 泛欧</option>
+                    </select>
+                    <p class="info-text">不同国家使用不同的运算规则</p>
+                </div>
+                <div class="form-group">
                     <label for="weight">产品重量 (kg)</label>
                     <input type="number" id="weight" placeholder="例如: 2.5" step="0.01" min="0">
                 </div>
@@ -85,7 +96,7 @@
 
             <!-- 运算规则配置 -->
             <div class="card rules-card" id="rulesCard">
-                <h2>运算规则</h2>
+                <h2>运算规则 - <span id="countryName">美国</span></h2>
 
                 <div class="admin-section" id="adminSection">
                     <div class="form-group">

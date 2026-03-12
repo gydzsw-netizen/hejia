@@ -1,6 +1,16 @@
 import { apiRequest, getCurrentUser, logout } from './auth.js';
 
 let currentSettings = null;
+let currentCountry = 'US'; // 默认美国
+
+// 国家名称映射
+const countryNames = {
+  'US': '美国',
+  'DE': '德国',
+  'GB': '英国',
+  'FR': '法国',
+  'EU': '泛欧'
+};
 
 /**
  * 加载用户设置
@@ -45,14 +55,19 @@ function applySettings(settings) {
 
   fields.forEach(field => {
     const snakeField = field.replace(/([A-Z])/g, '_$1').toLowerCase();
+    const countryField = `${currentCountry.toLowerCase()}_${snakeField}`;
+
     const element = document.getElementById(field);
     const adminElement = document.getElementById(field + 'Admin');
 
-    if (element && settings[snakeField] !== undefined) {
-      element.value = settings[snakeField];
+    // 优先使用国家特定设置，否则使用通用设置
+    const value = settings[countryField] !== undefined ? settings[countryField] : settings[snakeField];
+
+    if (element && value !== undefined) {
+      element.value = value;
     }
-    if (adminElement && settings[snakeField] !== undefined) {
-      adminElement.value = settings[snakeField];
+    if (adminElement && value !== undefined) {
+      adminElement.value = value;
     }
   });
 }
@@ -61,19 +76,38 @@ function applySettings(settings) {
  * 从表单获取设置
  */
 function getSettingsFromForm() {
+  const prefix = currentCountry.toLowerCase();
   return {
-    profit_rate: parseFloat(document.getElementById('profitRate').value),
-    weight_rate: parseFloat(document.getElementById('weightRate').value),
-    volume_factor: parseInt(document.getElementById('volumeFactor').value),
-    volume_rate: parseFloat(document.getElementById('volumeRate').value),
-    fixed_cost: parseFloat(document.getElementById('fixedCost').value),
-    min_price: parseFloat(document.getElementById('minPrice').value),
-    usd_rate: parseFloat(document.getElementById('usdRate').value),
-    eur_rate: parseFloat(document.getElementById('eurRate').value),
-    activity_rate: parseFloat(document.getElementById('activityRateAdmin').value),
-    ad_rate: parseFloat(document.getElementById('adRateAdmin').value),
-    refund_rate: parseFloat(document.getElementById('refundRate').value)
+    [`${prefix}_profit_rate`]: parseFloat(document.getElementById('profitRate').value),
+    [`${prefix}_weight_rate`]: parseFloat(document.getElementById('weightRate').value),
+    [`${prefix}_volume_factor`]: parseInt(document.getElementById('volumeFactor').value),
+    [`${prefix}_volume_rate`]: parseFloat(document.getElementById('volumeRate').value),
+    [`${prefix}_fixed_cost`]: parseFloat(document.getElementById('fixedCost').value),
+    [`${prefix}_min_price`]: parseFloat(document.getElementById('minPrice').value),
+    [`${prefix}_usd_rate`]: parseFloat(document.getElementById('usdRate').value),
+    [`${prefix}_eur_rate`]: parseFloat(document.getElementById('eurRate').value),
+    [`${prefix}_activity_rate`]: parseFloat(document.getElementById('activityRateAdmin').value),
+    [`${prefix}_ad_rate`]: parseFloat(document.getElementById('adRateAdmin').value),
+    [`${prefix}_refund_rate`]: parseFloat(document.getElementById('refundRate').value)
   };
+}
+
+/**
+ * 切换国家
+ */
+export function switchCountry(country) {
+  currentCountry = country;
+
+  // 更新国家名称显示
+  const countryNameElement = document.getElementById('countryName');
+  if (countryNameElement) {
+    countryNameElement.textContent = countryNames[country];
+  }
+
+  // 重新应用设置
+  if (currentSettings) {
+    applySettings(currentSettings);
+  }
 }
 
 /**
@@ -188,6 +222,16 @@ export async function initCalculator() {
 
   // 显示用户信息
   document.getElementById('username').textContent = user.username;
+
+  // 初始化国家选择器
+  const countrySelect = document.getElementById('country');
+  if (countrySelect) {
+    countrySelect.addEventListener('change', (e) => {
+      switchCountry(e.target.value);
+    });
+    // 设置初始国家
+    switchCountry(countrySelect.value);
+  }
 
   // 根据用户角色显示或隐藏运算规则卡片
   const rulesCard = document.getElementById('rulesCard');

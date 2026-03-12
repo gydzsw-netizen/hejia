@@ -83,7 +83,7 @@ export async function createUser(event) {
   }
 
   try {
-    const createBtn = document.getElementById('createUserBtn');
+    const createBtn = document.getElementById('createUserSubmitBtn');
     createBtn.disabled = true;
     createBtn.textContent = '创建中...';
 
@@ -98,7 +98,7 @@ export async function createUser(event) {
   } catch (error) {
     showError('创建用户失败: ' + error.message, 'createUserError');
   } finally {
-    const createBtn = document.getElementById('createUserBtn');
+    const createBtn = document.getElementById('createUserSubmitBtn');
     createBtn.disabled = false;
     createBtn.textContent = '创建用户';
   }
@@ -144,7 +144,7 @@ export async function resetPassword(event) {
   }
 
   try {
-    const resetBtn = document.getElementById('resetPasswordBtn');
+    const resetBtn = document.getElementById('resetPasswordSubmitBtn');
     resetBtn.disabled = true;
     resetBtn.textContent = '重置中...';
 
@@ -158,7 +158,7 @@ export async function resetPassword(event) {
   } catch (error) {
     showError('重置密码失败: ' + error.message, 'resetPasswordError');
   } finally {
-    const resetBtn = document.getElementById('resetPasswordBtn');
+    const resetBtn = document.getElementById('resetPasswordSubmitBtn');
     resetBtn.disabled = false;
     resetBtn.textContent = '重置密码';
   }

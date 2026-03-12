@@ -2,85 +2,105 @@ import { apiRequest } from './auth.js';
 
 let currentHistory = [];
 
+function escapeHtml(text) {
+  if (text === null || text === undefined) {
+    return '';
+  }
+  const div = document.createElement('div');
+  div.textContent = String(text);
+  return div.innerHTML;
+}
+
+function formatNumber(value, fractionDigits = 2) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) {
+    return (0).toFixed(fractionDigits);
+  }
+  return num.toFixed(fractionDigits);
+}
+
 /**
- * 保存计算历史记录
+ * Save one calculation history record
  */
 export async function saveHistory(calculationData) {
   try {
-    const data = await apiRequest('/api/history/save', {
+    return await apiRequest('/api/history/save', {
       method: 'POST',
       body: JSON.stringify(calculationData)
     });
-    return data;
   } catch (error) {
-    console.error('保存历史记录失败:', error);
+    console.error('Failed to save history:', error);
     throw error;
   }
 }
 
 /**
- * 加载历史记录列表
+ * Load history list
  */
 export async function loadHistory(options = {}) {
   try {
     const { limit = 50, offset = 0, search = '' } = options;
-    const params = new URLSearchParams({ limit, offset, search });
+    const params = new URLSearchParams({
+      limit: String(limit),
+      offset: String(offset),
+      search: String(search || '')
+    });
+
     const data = await apiRequest(`/api/history/list?${params}`);
-    currentHistory = data.history;
+    currentHistory = Array.isArray(data.history) ? data.history : [];
     return data;
   } catch (error) {
-    console.error('加载历史记录失败:', error);
+    console.error('Failed to load history:', error);
     throw error;
   }
 }
 
 /**
- * 删除历史记录
+ * Delete history by id
  */
 export async function deleteHistory(id) {
   try {
-    const data = await apiRequest(`/api/history/delete?id=${id}`, {
+    return await apiRequest(`/api/history/delete?id=${id}`, {
       method: 'DELETE'
     });
-    return data;
   } catch (error) {
-    console.error('删除历史记录失败:', error);
+    console.error('Failed to delete history:', error);
     throw error;
   }
 }
 
 /**
- * 渲染历史记录列表
+ * Render history list table
  */
 export function renderHistoryList(history, containerId = 'historyListBody') {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  if (!history || history.length === 0) {
-    container.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #999;">暂无历史记录</td></tr>';
+  if (!Array.isArray(history) || history.length === 0) {
+    container.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #999;">������ʷ��¼</td></tr>';
     return;
   }
 
   container.innerHTML = history.map(item => {
     const date = new Date(item.created_at).toLocaleString('zh-CN');
-    const productName = item.product_name || '未命名产品';
+    const productName = escapeHtml(item.product_name || 'δ������Ʒ');
 
     return `
       <tr style="border-bottom: 1px solid #e0e0e0;">
         <td style="padding: 12px;">${date}</td>
         <td style="padding: 12px;">${productName}</td>
-        <td style="padding: 12px;">${item.weight} kg</td>
-        <td style="padding: 12px;">¥${parseFloat(item.cost).toFixed(2)}</td>
+        <td style="padding: 12px;">${formatNumber(item.weight)} kg</td>
+        <td style="padding: 12px;">��${formatNumber(item.cost)}</td>
         <td style="padding: 12px;">
-          <div>¥${parseFloat(item.calculated_price_cny).toFixed(2)}</div>
+          <div>��${formatNumber(item.calculated_price_cny)}</div>
           <div style="font-size: 12px; color: #666;">
-            $${parseFloat(item.calculated_price_usd).toFixed(2)} /
-            €${parseFloat(item.calculated_price_eur).toFixed(2)}
+            $${formatNumber(item.calculated_price_usd)} /
+            �${formatNumber(item.calculated_price_eur)}
           </div>
         </td>
         <td style="padding: 12px; text-align: center;">
-          <button onclick="viewHistoryDetail(${item.id})" style="padding: 5px 10px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px;">查看</button>
-          <button onclick="deleteHistoryItem(${item.id})" style="padding: 5px 10px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">删除</button>
+          <button onclick="viewHistoryDetail(${item.id})" style="padding: 5px 10px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px;">�鿴</button>
+          <button onclick="deleteHistoryItem(${item.id})" style="padding: 5px 10px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">ɾ��</button>
         </td>
       </tr>
     `;
@@ -88,7 +108,7 @@ export function renderHistoryList(history, containerId = 'historyListBody') {
 }
 
 /**
- * 查看历史记录详情
+ * Show history detail dialog
  */
 export function viewHistoryDetail(id) {
   const item = currentHistory.find(h => h.id === id);
@@ -97,37 +117,36 @@ export function viewHistoryDetail(id) {
   const dialog = document.getElementById('historyDetailDialog');
   if (!dialog) return;
 
-  // 填充详情数据
-  document.getElementById('detailProductName').textContent = item.product_name || '未命名产品';
+  document.getElementById('detailProductName').textContent = item.product_name || 'δ������Ʒ';
   document.getElementById('detailDate').textContent = new Date(item.created_at).toLocaleString('zh-CN');
-  document.getElementById('detailWeight').textContent = `${item.weight} kg`;
-  document.getElementById('detailCost').textContent = `¥${parseFloat(item.cost).toFixed(2)}`;
+  document.getElementById('detailWeight').textContent = `${formatNumber(item.weight)} kg`;
+  document.getElementById('detailCost').textContent = `��${formatNumber(item.cost)}`;
 
   if (item.length && item.width && item.height) {
-    document.getElementById('detailSize').textContent = `${item.length} × ${item.width} × ${item.height} cm`;
+    document.getElementById('detailSize').textContent = `${formatNumber(item.length)} �� ${formatNumber(item.width)} �� ${formatNumber(item.height)} cm`;
   } else {
-    document.getElementById('detailSize').textContent = '未提供';
+    document.getElementById('detailSize').textContent = 'δ�ṩ';
   }
 
-  document.getElementById('detailPriceCNY').textContent = `¥${parseFloat(item.calculated_price_cny).toFixed(2)}`;
-  document.getElementById('detailPriceUSD').textContent = `$${parseFloat(item.calculated_price_usd).toFixed(2)}`;
-  document.getElementById('detailPriceEUR').textContent = `€${parseFloat(item.calculated_price_eur).toFixed(2)}`;
+  document.getElementById('detailPriceCNY').textContent = `��${formatNumber(item.calculated_price_cny)}`;
+  document.getElementById('detailPriceUSD').textContent = `$${formatNumber(item.calculated_price_usd)}`;
+  document.getElementById('detailPriceEUR').textContent = `�${formatNumber(item.calculated_price_eur)}`;
 
-  if (item.weight_shipping) {
-    document.getElementById('detailWeightShipping').textContent = `¥${parseFloat(item.weight_shipping).toFixed(2)}`;
+  if (item.weight_shipping !== null && item.weight_shipping !== undefined) {
+    document.getElementById('detailWeightShipping').textContent = `��${formatNumber(item.weight_shipping)}`;
   }
-  if (item.volume_shipping) {
-    document.getElementById('detailVolumeShipping').textContent = `¥${parseFloat(item.volume_shipping).toFixed(2)}`;
+  if (item.volume_shipping !== null && item.volume_shipping !== undefined) {
+    document.getElementById('detailVolumeShipping').textContent = `��${formatNumber(item.volume_shipping)}`;
   }
-  if (item.total_cost) {
-    document.getElementById('detailTotalCost').textContent = `¥${parseFloat(item.total_cost).toFixed(2)}`;
+  if (item.total_cost !== null && item.total_cost !== undefined) {
+    document.getElementById('detailTotalCost').textContent = `��${formatNumber(item.total_cost)}`;
   }
 
   dialog.style.display = 'flex';
 }
 
 /**
- * 关闭历史记录详情对话框
+ * Close history detail dialog
  */
 export function closeHistoryDetailDialog() {
   const dialog = document.getElementById('historyDetailDialog');
@@ -137,25 +156,23 @@ export function closeHistoryDetailDialog() {
 }
 
 /**
- * 删除历史记录项
+ * Delete history item from UI action
  */
 export async function deleteHistoryItem(id) {
-  if (!confirm('确定要删除这条历史记录吗？')) {
+  if (!confirm('ȷ��Ҫɾ��������ʷ��¼��')) {
     return;
   }
 
   try {
     await deleteHistory(id);
-    // 重新加载历史记录
     const data = await loadHistory();
     renderHistoryList(data.history);
-    alert('删除成功');
+    alert('ɾ���ɹ�');
   } catch (error) {
-    alert('删除失败：' + error.message);
+    alert(`ɾ��ʧ�ܣ�${error.message}`);
   }
 }
 
-// 导出到全局作用域供 HTML 使用
 if (typeof window !== 'undefined') {
   window.viewHistoryDetail = viewHistoryDetail;
   window.closeHistoryDetailDialog = closeHistoryDetailDialog;

@@ -9,7 +9,7 @@ async function handler(req, res) {
     return res.status(405).json({ message: '方法不允许' });
   }
 
-  const user = await requireAuth(req);
+  const { user } = await requireAuth(req);
 
   const { currentPassword, newPassword } = req.body;
 
@@ -23,7 +23,7 @@ async function handler(req, res) {
 
   // 获取用户当前密码哈希
   const userResult = await sql`
-    SELECT password_hash FROM users WHERE id = ${user.id}
+    SELECT password_hash FROM users WHERE id = ${user.userId}
   `;
 
   if (userResult.rows.length === 0) {
@@ -43,7 +43,7 @@ async function handler(req, res) {
   await sql`
     UPDATE users
     SET password_hash = ${newPasswordHash}, updated_at = CURRENT_TIMESTAMP
-    WHERE id = ${user.id}
+    WHERE id = ${user.userId}
   `;
 
   return res.status(200).json({
