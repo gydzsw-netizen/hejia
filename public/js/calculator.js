@@ -40,13 +40,19 @@ export async function saveSettings(settings) {
 function applySettings(settings) {
   const fields = [
     'profitRate', 'weightRate', 'volumeFactor', 'volumeRate',
-    'fixedCost', 'minPrice', 'usdRate', 'eurRate'
+    'fixedCost', 'minPrice', 'usdRate', 'eurRate', 'activityRate', 'adRate', 'refundRate'
   ];
 
   fields.forEach(field => {
+    const snakeField = field.replace(/([A-Z])/g, '_$1').toLowerCase();
     const element = document.getElementById(field);
-    if (element && settings[field.replace(/([A-Z])/g, '_$1').toLowerCase()] !== undefined) {
-      element.value = settings[field.replace(/([A-Z])/g, '_$1').toLowerCase()];
+    const adminElement = document.getElementById(field + 'Admin');
+
+    if (element && settings[snakeField] !== undefined) {
+      element.value = settings[snakeField];
+    }
+    if (adminElement && settings[snakeField] !== undefined) {
+      adminElement.value = settings[snakeField];
     }
   });
 }
@@ -63,7 +69,10 @@ function getSettingsFromForm() {
     fixed_cost: parseFloat(document.getElementById('fixedCost').value),
     min_price: parseFloat(document.getElementById('minPrice').value),
     usd_rate: parseFloat(document.getElementById('usdRate').value),
-    eur_rate: parseFloat(document.getElementById('eurRate').value)
+    eur_rate: parseFloat(document.getElementById('eurRate').value),
+    activity_rate: parseFloat(document.getElementById('activityRateAdmin').value),
+    ad_rate: parseFloat(document.getElementById('adRateAdmin').value),
+    refund_rate: parseFloat(document.getElementById('refundRate').value)
   };
 }
 
@@ -80,6 +89,9 @@ export function calculatePrice() {
 
   // 获取运算规则
   const profitRate = parseFloat(document.getElementById('profitRate').value) / 100;
+  const activityRate = parseFloat(document.getElementById('activityRate').value) / 100;
+  const adRate = parseFloat(document.getElementById('adRate').value) / 100;
+  const refundRate = parseFloat(document.getElementById('refundRate').value) / 100;
   const weightRate = parseFloat(document.getElementById('weightRate').value);
   const volumeFactor = parseFloat(document.getElementById('volumeFactor').value);
   const volumeRate = parseFloat(document.getElementById('volumeRate').value);
@@ -100,17 +112,26 @@ export function calculatePrice() {
   // 计算运费
   const weightShipping = weight * weightRate;
   const volumeShipping = volumeWeight * volumeRate;
+  const totalShipping = weightShipping + volumeShipping + fixedCost;
 
-  // 计算总成本
-  const totalCost = cost + weightShipping + volumeShipping + fixedCost;
+  // 计算销售价格（新公式）
+  // 售价 = (产品成本 + 运费) / (1 - 利润率 - 活动占比 - 广告占比 - 退款率)
+  const denominator = 1 - profitRate - activityRate - adRate - refundRate;
 
-  // 计算销售价格（人民币）
-  let salePriceCNY = totalCost * (1 + profitRate);
+  if (denominator <= 0) {
+    alert('利润率、活动占比、广告占比和退款率的总和不能大于或等于100%！');
+    return;
+  }
+
+  let salePriceCNY = (cost + totalShipping) / denominator;
 
   // 应用最低价格限制
   if (salePriceCNY < minPrice) {
     salePriceCNY = minPrice;
   }
+
+  // 计算利润值
+  const profitValue = salePriceCNY - cost - totalShipping;
 
   // 计算其他货币价格
   const salePriceUSD = salePriceCNY / usdRate;
@@ -120,6 +141,7 @@ export function calculatePrice() {
   document.getElementById('resultPriceCNY').textContent = `¥ ${salePriceCNY.toFixed(2)}`;
   document.getElementById('resultPriceUSD').textContent = `$ ${salePriceUSD.toFixed(2)}`;
   document.getElementById('resultPriceEUR').textContent = `€ ${salePriceEUR.toFixed(2)}`;
+  document.getElementById('resultProfit').textContent = `¥ ${profitValue.toFixed(2)}`;
 
   // 显示详细分解
   const breakdown = `
@@ -130,9 +152,15 @@ export function calculatePrice() {
       <p>• 体积重量: ${volumeWeight.toFixed(2)} kg</p>
       <p>• 体积运费: ${volumeWeight.toFixed(2)} kg × ¥${volumeRate.toFixed(2)} = ¥${volumeShipping.toFixed(2)}</p>
       <p>• 固定成本: ¥${fixedCost.toFixed(2)}</p>
-      <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3);"><strong>总成本: ¥${totalCost.toFixed(2)}</strong></p>
-      <p><strong>利润率: ${(profitRate * 100).toFixed(0)}%</strong></p>
-      <p><strong>利润金额: ¥${(salePriceCNY - totalCost).toFixed(2)}</strong></p>
+      <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3);"><strong>总运费: ¥${totalShipping.toFixed(2)}</strong></p>
+      <p><strong>成本合计: ¥${(cost + totalShipping).toFixed(2)}</strong></p>
+      <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3);"><strong>费率设置：</strong></p>
+      <p>• 利润率: ${(profitRate * 100).toFixed(1)}%</p>
+      <p>• 活动占比: ${(activityRate * 100).toFixed(1)}%</p>
+      <p>• 广告占比: ${(adRate * 100).toFixed(1)}%</p>
+      <p>• 退款率: ${(refundRate * 100).toFixed(1)}%</p>
+      <p><strong>总费率: ${((profitRate + activityRate + adRate + refundRate) * 100).toFixed(1)}%</strong></p>
+      <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3);"><strong>利润值: ¥${profitValue.toFixed(2)}</strong></p>
       <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3);"><strong>汇率设置：</strong></p>
       <p>• 美元汇率: 1 USD = ¥${usdRate.toFixed(2)}</p>
       <p>• 欧元汇率: 1 EUR = ¥${eurRate.toFixed(2)}</p>
@@ -191,7 +219,7 @@ export async function initCalculator() {
 
   // 监听设置变化，自动保存（仅管理员）
   if (user.role === 'admin') {
-    const settingFields = ['profitRate', 'weightRate', 'volumeFactor', 'volumeRate', 'fixedCost', 'minPrice', 'usdRate', 'eurRate'];
+    const settingFields = ['profitRate', 'weightRate', 'volumeFactor', 'volumeRate', 'fixedCost', 'minPrice', 'usdRate', 'eurRate', 'activityRateAdmin', 'adRateAdmin', 'refundRate'];
     settingFields.forEach(id => {
       const element = document.getElementById(id);
       if (element) {
@@ -199,6 +227,9 @@ export async function initCalculator() {
           try {
             const settings = getSettingsFromForm();
             await saveSettings(settings);
+            // 同步更新产品信息中的只读字段
+            document.getElementById('activityRate').value = settings.activity_rate;
+            document.getElementById('adRate').value = settings.ad_rate;
           } catch (error) {
             console.error('保存设置失败:', error);
           }
