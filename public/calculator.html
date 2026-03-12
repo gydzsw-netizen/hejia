@@ -22,7 +22,7 @@
             grid-column: auto;
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
-        /* 价格倒推和倒推运算规则单独一排 */
+        /* 管理员：价格倒推和倒推运算规则单独一排 */
         .card.reverse-card {
             grid-column: 1 / -1;
         }
@@ -30,6 +30,17 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
+        }
+        /* 普通用户：倒推板块与其他板块并列 */
+        .main-content.no-admin .card.reverse-card {
+            grid-column: auto;
+        }
+        .main-content.no-admin .reverse-row {
+            display: block;
+        }
+        /* 普通用户：隐藏倒推运算明细 */
+        .main-content.no-admin #reverseBreakdown {
+            display: none;
         }
 
         /* 国家选择器样式优化 */
