@@ -7,7 +7,7 @@ let users = [];
  */
 export async function loadUsers() {
   try {
-    const data = await apiRequest('/api/users/list');
+    const data = await apiRequest('/api/users?action=list');
     users = data.users;
     renderUserTable();
     return users;
@@ -87,7 +87,7 @@ export async function createUser(event) {
     createBtn.disabled = true;
     createBtn.textContent = '创建中...';
 
-    await apiRequest('/api/users/create', {
+    await apiRequest('/api/users?action=create', {
       method: 'POST',
       body: JSON.stringify({ username, password, role })
     });
@@ -148,7 +148,7 @@ export async function resetPassword(event) {
     resetBtn.disabled = true;
     resetBtn.textContent = '重置中...';
 
-    await apiRequest('/api/users/reset-password', {
+    await apiRequest('/api/users?action=admin-change-password', {
       method: 'POST',
       body: JSON.stringify({ userId, newPassword })
     });
