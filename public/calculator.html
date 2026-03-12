@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/css/styles.css">
     <style>
         .main-content {
-            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
         }
         .main-content.no-admin {
             grid-template-columns: 1fr 1fr 1fr;
@@ -21,6 +21,15 @@
         .card.result-card {
             grid-column: auto;
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        /* 价格倒推和倒推运算规则单独一排 */
+        .card.reverse-card {
+            grid-column: 1 / -1;
+        }
+        .reverse-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
 
         /* 国家选择器样式优化 */
@@ -68,6 +77,9 @@
             }
             .card.result-card {
                 grid-column: 1;
+            }
+            .reverse-row {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -258,67 +270,72 @@
                 </div>
             </div>
 
-            <!-- 价格倒推 -->
-            <div class="card">
-                <h2>价格倒推 - <span id="reverseCountryName">美国</span></h2>
-                <div class="form-group">
-                    <label for="reversePrice">销售价格 (元)</label>
-                    <input type="number" id="reversePrice" placeholder="例如: 200" step="0.01" min="0">
-                </div>
-                <div class="form-group">
-                    <label for="reverseWeight">产品重量 (kg)</label>
-                    <input type="number" id="reverseWeight" placeholder="例如: 2.5" step="0.01" min="0">
-                </div>
-                <div class="form-group">
-                    <label for="reverseCost">产品成本 (元)</label>
-                    <input type="number" id="reverseCost" placeholder="例如: 100" step="0.01" min="0">
-                </div>
-                <div class="form-group">
-                    <label>产品尺寸 (cm)</label>
-                    <div class="size-inputs">
-                        <input type="number" id="reverseLength" value="18" step="0.1" min="0">
-                        <input type="number" id="reverseWidth" value="15" step="0.1" min="0">
-                        <input type="number" id="reverseHeight" value="3" step="0.1" min="0">
-                    </div>
-                </div>
-                <button class="btn" id="reverseCalculateBtn">倒推利润率</button>
-
-                <div style="margin-top: 20px; padding: 15px; background: #f0f9ff; border-radius: 8px; border: 2px solid #667eea;">
-                    <div style="text-align: center; margin-bottom: 15px;">
-                        <div style="font-size: 1.1em; font-weight: 600; color: #667eea;">倒推结果</div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <div style="text-align: center; padding: 10px; background: white; border-radius: 6px;">
-                            <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">利润率</div>
-                            <div style="font-size: 1.5em; font-weight: 700; color: #667eea;" id="reverseProfitRate">0.0%</div>
+            <!-- 价格倒推区域 - 单独一排 -->
+            <div class="card reverse-card">
+                <div class="reverse-row">
+                    <!-- 价格倒推 -->
+                    <div>
+                        <h2>价格倒推 - <span id="reverseCountryName">美国</span></h2>
+                        <div class="form-group">
+                            <label for="reversePrice">销售价格 (元)</label>
+                            <input type="number" id="reversePrice" placeholder="例如: 200" step="0.01" min="0">
                         </div>
-                        <div style="text-align: center; padding: 10px; background: white; border-radius: 6px;">
-                            <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">利润值</div>
-                            <div style="font-size: 1.5em; font-weight: 700; color: #f5576c;" id="reverseProfitValue">¥ 0.00</div>
+                        <div class="form-group">
+                            <label for="reverseWeight">产品重量 (kg)</label>
+                            <input type="number" id="reverseWeight" placeholder="例如: 2.5" step="0.01" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="reverseCost">产品成本 (元)</label>
+                            <input type="number" id="reverseCost" placeholder="例如: 100" step="0.01" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>产品尺寸 (cm)</label>
+                            <div class="size-inputs">
+                                <input type="number" id="reverseLength" value="18" step="0.1" min="0">
+                                <input type="number" id="reverseWidth" value="15" step="0.1" min="0">
+                                <input type="number" id="reverseHeight" value="3" step="0.1" min="0">
+                            </div>
+                        </div>
+                        <button class="btn" id="reverseCalculateBtn">倒推利润率</button>
+
+                        <div style="margin-top: 20px; padding: 15px; background: #f0f9ff; border-radius: 8px; border: 2px solid #667eea;">
+                            <div style="text-align: center; margin-bottom: 15px;">
+                                <div style="font-size: 1.1em; font-weight: 600; color: #667eea;">倒推结果</div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div style="text-align: center; padding: 10px; background: white; border-radius: 6px;">
+                                    <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">利润率</div>
+                                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;" id="reverseProfitRate">0.0%</div>
+                                </div>
+                                <div style="text-align: center; padding: 10px; background: white; border-radius: 6px;">
+                                    <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">利润值</div>
+                                    <div style="font-size: 1.5em; font-weight: 700; color: #f5576c;" id="reverseProfitValue">¥ 0.00</div>
+                                </div>
+                            </div>
+                            <div id="reverseBreakdown" style="margin-top: 15px;"></div>
                         </div>
                     </div>
-                    <div id="reverseBreakdown" style="margin-top: 15px;"></div>
-                </div>
-            </div>
 
-            <!-- 倒推运算规则 -->
-            <div class="card rules-card" id="reverseRulesCard">
-                <h2>倒推运算规则 - <span id="reverseRulesCountryName">美国</span></h2>
-                <div style="padding: 15px; background: #f5f5f5; border-radius: 6px;">
-                    <strong>倒推公式：</strong>
-                    <p style="margin-top: 10px; font-size: 14px; line-height: 1.6;">
-                        利润值 = 销售价格 - 产品成本 - 运费
-                        <br><br>
-                        利润率 = 利润值 / 销售价格 × 100%
-                        <br><br>
-                        运费 = 重量运费 + 体积运费 + 固定成本
-                        <br>
-                        重量运费 = 实际重量 × 重量运费系数
-                        <br>
-                        体积运费 = 体积重量 × 体积运费系数
-                        <br>
-                        体积重量 = 长 × 宽 × 高 ÷ 体积系数
-                    </p>
+                    <!-- 倒推运算规则 -->
+                    <div class="rules-card" id="reverseRulesCard">
+                        <h2>倒推运算规则 - <span id="reverseRulesCountryName">美国</span></h2>
+                        <div style="padding: 15px; background: #f5f5f5; border-radius: 6px;">
+                            <strong>倒推公式：</strong>
+                            <p style="margin-top: 10px; font-size: 14px; line-height: 1.6;">
+                                利润值 = 销售价格 - 产品成本 - 运费
+                                <br><br>
+                                利润率 = 利润值 / 销售价格 × 100%
+                                <br><br>
+                                运费 = 重量运费 + 体积运费 + 固定成本
+                                <br>
+                                重量运费 = 实际重量 × 重量运费系数
+                                <br>
+                                体积运费 = 体积重量 × 体积运费系数
+                                <br>
+                                体积重量 = 长 × 宽 × 高 ÷ 体积系数
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
