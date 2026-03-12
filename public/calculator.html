@@ -22,6 +22,43 @@
             grid-column: auto;
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
+
+        /* 国家选择器样式优化 */
+        .country-selector {
+            position: relative;
+        }
+        .country-selector select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            background: white;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 40px;
+        }
+        .country-selector select:hover {
+            border-color: #764ba2;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+        .country-selector select:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .country-selector .info-text {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #666;
+            font-style: italic;
+        }
+
         @media (max-width: 1024px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -53,16 +90,16 @@
             <!-- 产品信息输入 -->
             <div class="card">
                 <h2>产品信息</h2>
-                <div class="form-group">
-                    <label for="country">选择国家</label>
-                    <select id="country" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 16px; cursor: pointer;">
-                        <option value="US">🇺🇸 美国</option>
-                        <option value="DE">🇩🇪 德国</option>
-                        <option value="GB">🇬🇧 英国</option>
-                        <option value="FR">🇫🇷 法国</option>
-                        <option value="EU">🇪🇺 泛欧</option>
+                <div class="form-group country-selector">
+                    <label for="country">🌍 选择目标国家</label>
+                    <select id="country">
+                        <option value="US">🇺🇸 美国 (United States)</option>
+                        <option value="DE">🇩🇪 德国 (Germany)</option>
+                        <option value="GB">🇬🇧 英国 (United Kingdom)</option>
+                        <option value="FR">🇫🇷 法国 (France)</option>
+                        <option value="EU">🇪🇺 泛欧 (Pan-European)</option>
                     </select>
-                    <p class="info-text">不同国家使用不同的运算规则</p>
+                    <p class="info-text">💡 不同国家使用不同的运费规则和汇率</p>
                 </div>
                 <div class="form-group">
                     <label for="weight">产品重量 (kg)</label>
@@ -176,7 +213,7 @@
 
             <!-- 计算结果 -->
             <div class="card result-card">
-                <h2>计算结果</h2>
+                <h2>计算结果 - <span id="resultCountryName">美国</span></h2>
                 <div class="result-display">
                     <div class="label">建议销售价格</div>
                     <div class="multi-currency">

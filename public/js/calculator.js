@@ -5,11 +5,11 @@ let currentCountry = 'US'; // 默认美国
 
 // 国家名称映射
 const countryNames = {
-  'US': '美国',
-  'DE': '德国',
-  'GB': '英国',
-  'FR': '法国',
-  'EU': '泛欧'
+  'US': '🇺🇸 美国',
+  'DE': '🇩🇪 德国',
+  'GB': '🇬🇧 英国',
+  'FR': '🇫🇷 法国',
+  'EU': '🇪🇺 泛欧'
 };
 
 /**
@@ -100,13 +100,39 @@ export function switchCountry(country) {
 
   // 更新国家名称显示
   const countryNameElement = document.getElementById('countryName');
+  const resultCountryNameElement = document.getElementById('resultCountryName');
   if (countryNameElement) {
     countryNameElement.textContent = countryNames[country];
+  }
+  if (resultCountryNameElement) {
+    resultCountryNameElement.textContent = countryNames[country];
   }
 
   // 重新应用设置
   if (currentSettings) {
     applySettings(currentSettings);
+
+    // 同步更新产品信息中的只读字段
+    const prefix = country.toLowerCase();
+    const activityRateField = `${prefix}_activity_rate`;
+    const adRateField = `${prefix}_ad_rate`;
+
+    const activityRate = currentSettings[activityRateField] !== undefined
+      ? currentSettings[activityRateField]
+      : (currentSettings.activity_rate || 0);
+    const adRate = currentSettings[adRateField] !== undefined
+      ? currentSettings[adRateField]
+      : (currentSettings.ad_rate || 0);
+
+    const activityRateElement = document.getElementById('activityRate');
+    const adRateElement = document.getElementById('adRate');
+
+    if (activityRateElement) {
+      activityRateElement.value = activityRate;
+    }
+    if (adRateElement) {
+      adRateElement.value = adRate;
+    }
   }
 }
 
@@ -272,8 +298,11 @@ export async function initCalculator() {
             const settings = getSettingsFromForm();
             await saveSettings(settings);
             // 同步更新产品信息中的只读字段
-            document.getElementById('activityRate').value = settings.activity_rate;
-            document.getElementById('adRate').value = settings.ad_rate;
+            const prefix = currentCountry.toLowerCase();
+            const activityRateKey = `${prefix}_activity_rate`;
+            const adRateKey = `${prefix}_ad_rate`;
+            document.getElementById('activityRate').value = settings[activityRateKey];
+            document.getElementById('adRate').value = settings[adRateKey];
           } catch (error) {
             console.error('保存设置失败:', error);
           }
