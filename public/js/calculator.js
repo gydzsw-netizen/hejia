@@ -7,7 +7,7 @@ let currentSettings = null;
  */
 export async function loadSettings() {
   try {
-    const data = await apiRequest('/api/settings/get');
+    const data = await apiRequest('/api/settings');
     currentSettings = data.settings;
     applySettings(currentSettings);
     return currentSettings;
@@ -22,7 +22,7 @@ export async function loadSettings() {
  */
 export async function saveSettings(settings) {
   try {
-    const data = await apiRequest('/api/settings/save', {
+    const data = await apiRequest('/api/settings', {
       method: 'POST',
       body: JSON.stringify({ settings })
     });
@@ -161,9 +161,24 @@ export async function initCalculator() {
   // 显示用户信息
   document.getElementById('username').textContent = user.username;
 
-  // 如果是管理员，显示管理员链接
+  // 根据用户角色显示或隐藏运算规则卡片
+  const rulesCard = document.getElementById('rulesCard');
+  const mainContent = document.getElementById('mainContent');
+
   if (user.role === 'admin') {
+    // 管理员：显示管理员链接和运算规则卡片
     document.getElementById('adminLink').style.display = 'inline-block';
+    if (rulesCard) {
+      rulesCard.classList.remove('hidden');
+    }
+  } else {
+    // 普通用户：隐藏运算规则卡片，调整布局
+    if (rulesCard) {
+      rulesCard.classList.add('hidden');
+    }
+    if (mainContent) {
+      mainContent.classList.add('no-admin');
+    }
   }
 
   // 加载用户设置
@@ -174,21 +189,23 @@ export async function initCalculator() {
     alert('加载设置失败，将使用默认值');
   }
 
-  // 监听设置变化，自动保存
-  const settingFields = ['profitRate', 'weightRate', 'volumeFactor', 'volumeRate', 'fixedCost', 'minPrice', 'usdRate', 'eurRate'];
-  settingFields.forEach(id => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.addEventListener('change', async () => {
-        try {
-          const settings = getSettingsFromForm();
-          await saveSettings(settings);
-        } catch (error) {
-          console.error('保存设置失败:', error);
-        }
-      });
-    }
-  });
+  // 监听设置变化，自动保存（仅管理员）
+  if (user.role === 'admin') {
+    const settingFields = ['profitRate', 'weightRate', 'volumeFactor', 'volumeRate', 'fixedCost', 'minPrice', 'usdRate', 'eurRate'];
+    settingFields.forEach(id => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.addEventListener('change', async () => {
+          try {
+            const settings = getSettingsFromForm();
+            await saveSettings(settings);
+          } catch (error) {
+            console.error('保存设置失败:', error);
+          }
+        });
+      }
+    });
+  }
 
   // 绑定登出按钮
   document.getElementById('logoutBtn').addEventListener('click', (e) => {

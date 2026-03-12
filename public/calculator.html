@@ -5,6 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>销售价格核算系统</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .main-content {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+        .main-content.no-admin {
+            grid-template-columns: 1fr 1fr;
+        }
+        .card.rules-card {
+            display: block;
+        }
+        .card.rules-card.hidden {
+            display: none;
+        }
+        .card.result-card {
+            grid-column: auto;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .main-content.no-admin {
+                grid-template-columns: 1fr;
+            }
+            .card.result-card {
+                grid-column: 1;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -20,7 +49,7 @@
             </div>
         </div>
 
-        <div class="main-content">
+        <div class="main-content" id="mainContent">
             <!-- 产品信息输入 -->
             <div class="card">
                 <h2>产品信息</h2>
@@ -45,10 +74,7 @@
             </div>
 
             <!-- 运算规则配置 -->
-            <div class="card">
-                <div class="admin-toggle">
-                    <button id="toggleAdminBtn">运算规则设置</button>
-                </div>
+            <div class="card rules-card" id="rulesCard">
                 <h2>运算规则</h2>
 
                 <div class="admin-section" id="adminSection">
@@ -137,7 +163,7 @@
 
     <script type="module">
         import { checkAuth } from '/js/auth.js';
-        import { initCalculator, calculatePrice, toggleAdmin } from '/js/calculator.js';
+        import { initCalculator, calculatePrice } from '/js/calculator.js';
 
         // 页面加载时检查认证
         window.addEventListener('DOMContentLoaded', async () => {
@@ -149,7 +175,6 @@
 
         // 绑定按钮事件
         document.getElementById('calculateBtn').addEventListener('click', calculatePrice);
-        document.getElementById('toggleAdminBtn').addEventListener('click', toggleAdmin);
     </script>
 </body>
 </html>
