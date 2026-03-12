@@ -147,11 +147,19 @@ export function calculatePrice() {
   const width = parseFloat(document.getElementById('width').value) || 0;
   const height = parseFloat(document.getElementById('height').value) || 0;
 
-  // 获取运算规则
-  const profitRate = parseFloat(document.getElementById('profitRate').value) / 100;
+  // 获取用户输入的利润率（优先使用产品信息中的利润率）
+  const userProfitRateElement = document.getElementById('userProfitRate');
+  const profitRate = userProfitRateElement
+    ? parseFloat(userProfitRateElement.value) / 100
+    : parseFloat(document.getElementById('profitRate').value) / 100;
+
   const activityRate = parseFloat(document.getElementById('activityRate').value) / 100;
   const adRate = parseFloat(document.getElementById('adRate').value) / 100;
-  const refundRate = parseFloat(document.getElementById('refundRate').value) / 100;
+
+  // 获取管理员设置的运算规则
+  const refundRateElement = document.getElementById('refundRate');
+  const refundRate = refundRateElement ? parseFloat(refundRateElement.value) / 100 : 0;
+
   const weightRate = parseFloat(document.getElementById('weightRate').value);
   const volumeFactor = parseFloat(document.getElementById('volumeFactor').value);
   const volumeRate = parseFloat(document.getElementById('volumeRate').value);
@@ -190,18 +198,26 @@ export function calculatePrice() {
     salePriceCNY = minPrice;
   }
 
-  // 计算利润值
-  const profitValue = salePriceCNY - cost - totalShipping;
+  // 计算利润值（人民币）
+  const profitValueCNY = salePriceCNY - cost - totalShipping;
 
   // 计算其他货币价格
   const salePriceUSD = salePriceCNY / usdRate;
   const salePriceEUR = salePriceCNY / eurRate;
 
-  // 显示结果
+  // 计算其他货币的利润值
+  const profitValueUSD = profitValueCNY / usdRate;
+  const profitValueEUR = profitValueCNY / eurRate;
+
+  // 显示销售价格
   document.getElementById('resultPriceCNY').textContent = `¥ ${salePriceCNY.toFixed(2)}`;
   document.getElementById('resultPriceUSD').textContent = `$ ${salePriceUSD.toFixed(2)}`;
   document.getElementById('resultPriceEUR').textContent = `€ ${salePriceEUR.toFixed(2)}`;
-  document.getElementById('resultProfit').textContent = `¥ ${profitValue.toFixed(2)}`;
+
+  // 显示利润值（三种货币）
+  document.getElementById('resultProfitCNY').textContent = `¥ ${profitValueCNY.toFixed(2)}`;
+  document.getElementById('resultProfitUSD').textContent = `$ ${profitValueUSD.toFixed(2)}`;
+  document.getElementById('resultProfitEUR').textContent = `€ ${profitValueEUR.toFixed(2)}`;
 
   // 显示详细分解
   const breakdown = `
@@ -220,7 +236,10 @@ export function calculatePrice() {
       <p>• 广告占比: ${(adRate * 100).toFixed(1)}%</p>
       <p>• 退款率: ${(refundRate * 100).toFixed(1)}%</p>
       <p><strong>总费率: ${((profitRate + activityRate + adRate + refundRate) * 100).toFixed(1)}%</strong></p>
-      <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3);"><strong>利润值: ¥${profitValue.toFixed(2)}</strong></p>
+      <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3);"><strong>利润值：</strong></p>
+      <p>• 人民币: ¥${profitValueCNY.toFixed(2)}</p>
+      <p>• 美元: $${profitValueUSD.toFixed(2)}</p>
+      <p>• 欧元: €${profitValueEUR.toFixed(2)}</p>
       <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3);"><strong>汇率设置：</strong></p>
       <p>• 美元汇率: 1 USD = ¥${usdRate.toFixed(2)}</p>
       <p>• 欧元汇率: 1 EUR = ¥${eurRate.toFixed(2)}</p>
