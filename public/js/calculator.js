@@ -101,11 +101,20 @@ export function switchCountry(country) {
   // 更新国家名称显示
   const countryNameElement = document.getElementById('countryName');
   const resultCountryNameElement = document.getElementById('resultCountryName');
+  const reverseCountryNameElement = document.getElementById('reverseCountryName');
+  const reverseRulesCountryNameElement = document.getElementById('reverseRulesCountryName');
+
   if (countryNameElement) {
     countryNameElement.textContent = countryNames[country];
   }
   if (resultCountryNameElement) {
     resultCountryNameElement.textContent = countryNames[country];
+  }
+  if (reverseCountryNameElement) {
+    reverseCountryNameElement.textContent = countryNames[country];
+  }
+  if (reverseRulesCountryNameElement) {
+    reverseRulesCountryNameElement.textContent = countryNames[country];
   }
 
   // 重新应用设置
@@ -219,33 +228,84 @@ export function calculatePrice() {
   document.getElementById('resultProfitUSD').textContent = `$ ${profitValueUSD.toFixed(2)}`;
   document.getElementById('resultProfitEUR').textContent = `€ ${profitValueEUR.toFixed(2)}`;
 
-  // 显示详细分解
+  // 隐藏详细运算过程，仅保留简要信息
   const breakdown = `
-    <div style="text-align: left; font-size: 0.9em;">
-      <p><strong>成本明细：</strong></p>
-      <p>• 产品成本: ¥${cost.toFixed(2)}</p>
-      <p>• 重量运费: ${weight.toFixed(2)} kg × ¥${weightRate.toFixed(2)} = ¥${weightShipping.toFixed(2)}</p>
-      <p>• 体积重量: ${volumeWeight.toFixed(2)} kg</p>
-      <p>• 体积运费: ${volumeWeight.toFixed(2)} kg × ¥${volumeRate.toFixed(2)} = ¥${volumeShipping.toFixed(2)}</p>
-      <p>• 固定成本: ¥${fixedCost.toFixed(2)}</p>
-      <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3);"><strong>总运费: ¥${totalShipping.toFixed(2)}</strong></p>
-      <p><strong>成本合计: ¥${(cost + totalShipping).toFixed(2)}</strong></p>
-      <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3);"><strong>费率设置：</strong></p>
-      <p>• 利润率: ${(profitRate * 100).toFixed(1)}%</p>
-      <p>• 活动占比: ${(activityRate * 100).toFixed(1)}%</p>
-      <p>• 广告占比: ${(adRate * 100).toFixed(1)}%</p>
-      <p>• 退款率: ${(refundRate * 100).toFixed(1)}%</p>
-      <p><strong>总费率: ${((profitRate + activityRate + adRate + refundRate) * 100).toFixed(1)}%</strong></p>
-      <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3);"><strong>利润值：</strong></p>
-      <p>• 人民币: ¥${profitValueCNY.toFixed(2)}</p>
-      <p>• 美元: $${profitValueUSD.toFixed(2)}</p>
-      <p>• 欧元: €${profitValueEUR.toFixed(2)}</p>
-      <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3);"><strong>汇率设置：</strong></p>
-      <p>• 美元汇率: 1 USD = ¥${usdRate.toFixed(2)}</p>
-      <p>• 欧元汇率: 1 EUR = ¥${eurRate.toFixed(2)}</p>
+    <div style="text-align: center; font-size: 0.9em; opacity: 0.9;">
+      <p style="margin-top: 10px;">计算完成</p>
     </div>
   `;
   document.getElementById('breakdown').innerHTML = breakdown;
+}
+
+/**
+ * 价格倒推计算
+ */
+export function reverseCalculatePrice() {
+  // 获取输入值
+  const salePrice = parseFloat(document.getElementById('reversePrice').value) || 0;
+  const weight = parseFloat(document.getElementById('reverseWeight').value) || 0;
+  const cost = parseFloat(document.getElementById('reverseCost').value) || 0;
+  const length = parseFloat(document.getElementById('reverseLength').value) || 0;
+  const width = parseFloat(document.getElementById('reverseWidth').value) || 0;
+  const height = parseFloat(document.getElementById('reverseHeight').value) || 0;
+
+  // 验证输入
+  if (salePrice <= 0 || weight <= 0 || cost <= 0) {
+    alert('请输入有效的销售价格、重量和成本！');
+    return;
+  }
+
+  // 获取运算规则参数
+  const weightRate = parseFloat(document.getElementById('weightRate').value);
+  const volumeFactor = parseFloat(document.getElementById('volumeFactor').value);
+  const volumeRate = parseFloat(document.getElementById('volumeRate').value);
+  const fixedCost = parseFloat(document.getElementById('fixedCost').value);
+
+  // 计算体积重量
+  const volumeWeight = (length * width * height) / volumeFactor;
+
+  // 计算运费
+  const weightShipping = weight * weightRate;
+  const volumeShipping = volumeWeight * volumeRate;
+  const totalShipping = weightShipping + volumeShipping + fixedCost;
+
+  // 倒推利润值
+  const profitValue = salePrice - cost - totalShipping;
+
+  // 倒推利润率
+  const profitRate = (profitValue / salePrice) * 100;
+
+  // 显示结果
+  document.getElementById('reverseProfitRate').textContent = `${profitRate.toFixed(1)}%`;
+  document.getElementById('reverseProfitValue').textContent = `¥ ${profitValue.toFixed(2)}`;
+
+  // 根据用户角色决定是否显示详细分解
+  const user = getCurrentUser();
+  const breakdownElement = document.getElementById('reverseBreakdown');
+
+  if (user && user.role === 'admin') {
+    // 管理员显示详细运算过程
+    const breakdown = `
+      <div style="text-align: left; font-size: 0.85em; padding-top: 10px; border-top: 1px solid #ddd;">
+        <p><strong>运算过程：</strong></p>
+        <p>• 销售价格: ¥${salePrice.toFixed(2)}</p>
+        <p>• 产品成本: ¥${cost.toFixed(2)}</p>
+        <p>• 重量运费: ${weight.toFixed(2)} kg × ¥${weightRate.toFixed(2)} = ¥${weightShipping.toFixed(2)}</p>
+        <p>• 体积重量: ${volumeWeight.toFixed(2)} kg</p>
+        <p>• 体积运费: ${volumeWeight.toFixed(2)} kg × ¥${volumeRate.toFixed(2)} = ¥${volumeShipping.toFixed(2)}</p>
+        <p>• 固定成本: ¥${fixedCost.toFixed(2)}</p>
+        <p style="margin-top: 8px;"><strong>总运费: ¥${totalShipping.toFixed(2)}</strong></p>
+        <p style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #ddd;">
+          <strong>利润值 = ${salePrice.toFixed(2)} - ${cost.toFixed(2)} - ${totalShipping.toFixed(2)} = ¥${profitValue.toFixed(2)}</strong>
+        </p>
+        <p><strong>利润率 = ${profitValue.toFixed(2)} ÷ ${salePrice.toFixed(2)} × 100% = ${profitRate.toFixed(1)}%</strong></p>
+      </div>
+    `;
+    breakdownElement.innerHTML = breakdown;
+  } else {
+    // 普通用户隐藏运算过程
+    breakdownElement.innerHTML = '';
+  }
 }
 
 /**
@@ -280,6 +340,7 @@ export async function initCalculator() {
 
   // 根据用户角色显示或隐藏运算规则卡片
   const rulesCard = document.getElementById('rulesCard');
+  const reverseRulesCard = document.getElementById('reverseRulesCard');
   const mainContent = document.getElementById('mainContent');
 
   if (user.role === 'admin') {
@@ -288,10 +349,16 @@ export async function initCalculator() {
     if (rulesCard) {
       rulesCard.classList.remove('hidden');
     }
+    if (reverseRulesCard) {
+      reverseRulesCard.classList.remove('hidden');
+    }
   } else {
     // 普通用户：隐藏运算规则卡片，调整布局
     if (rulesCard) {
       rulesCard.classList.add('hidden');
+    }
+    if (reverseRulesCard) {
+      reverseRulesCard.classList.add('hidden');
     }
     if (mainContent) {
       mainContent.classList.add('no-admin');
